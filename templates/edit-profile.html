@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+</head>
+<body>
+
+    <div class="card">
+
+        <!-- CIRCLE IMAGE PREVIEW -->
+        <div class="icon-container">
+            {% if profile.profile_picture %}
+                <img class="profile-img"
+     src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}{% static 'images/user_img.png' %}{% endif %}"
+     alt="Profile">
+
+            {% endif %}
+        </div>
+
+        <h3>click on edit and select your profile</h3>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <input type="file" id="uploadImage" name="profile_picture"
+                accept="image/*" onchange="previewImage(event)" style="display:none;">
+
+            <label for="uploadImage" class="edit-btn">Edit</label>
+
+            <button type="submit" class="save-btn">Save</button>
+            <button type="button" class="save-btn" 
+                    onclick="window.location.href='{% url 'my-profile' %}'">Cancel</button>
+        </form>
+
+
+    </div>
+
+    <!-- PLACE SCRIPT HERE (VERY IMPORTANT) -->
+    <script>
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const img = document.getElementById("previewImg");
+                img.src = URL.createObjectURL(file);
+                img.style.display = "block";
+            }
+        }
+    </script>
+
+</body>
+</html>
