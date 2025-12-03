@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, logout as auth_logout
-from django.contrib.auth import login
+from django.contrib.auth import authenticate, logout  as auth_logout
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
 from profiles.models import Profile
-from django.conf import settings
+from django.conf import settings 
 import os
 
 
@@ -14,7 +14,6 @@ import os
 @login_required(login_url='login')
 def index(request):
     return render(request, "index.html")
-
 
 # signup page
 def signup(request):
@@ -27,6 +26,7 @@ def signup(request):
         email = request.POST.get("signup_email")
         password = request.POST.get("signup_password")
         confirm_password = request.POST.get("signup_confirm_password")
+        
 
         if not name or not email or not password or not confirm_password:
             return render(request, "signup.html", {'error': True})
@@ -46,7 +46,7 @@ def signup(request):
             email=email,
             password=password
         )
-        user.is_staff = True
+        user.is_staff = True  # <-- Make this user a staff user
         user.save()
 
         login(request, user)
@@ -54,9 +54,8 @@ def signup(request):
 
     return render(request, "signup.html")
 
+# login page 
 
-
-# login page
 def login_view(request):
     if request.method == "POST":
         email = request.POST.get("login_email")
@@ -70,11 +69,13 @@ def login_view(request):
         except User.DoesNotExist:
             return render(request, "login.html", {"email_invalid": True})
 
+        # Authenticate using username + password
         user = authenticate(request, username=user_obj.username, password=password)
 
         if user is None:
             return render(request, "login.html", {"password_invalid": True})
 
+        # Check if user is staff
         if not user.is_staff:
             return render(request, "login.html", {"not_staff_error": "You are not a staff user!"})
 
@@ -84,8 +85,7 @@ def login_view(request):
     return render(request, "login.html")
 
 
-
-# logout page
+#logout page 
 @login_required(login_url='login')
 def logout(request):
     auth_logout(request)
@@ -93,10 +93,10 @@ def logout(request):
 
 
 
-# profile page
+#profile page 
 @staff_member_required(login_url='login')
 def profile(request):
-    profile, created = Profile.objects.get_or_create(user=request.user)
+    profile = Profile.objects.get(user=request.user)
     context = {
         "name": request.user.username,
         "email": request.user.email,
@@ -104,54 +104,59 @@ def profile(request):
     }
     return render(request, "profile.html", context)
 
-
-
-# my-profile update page
+# my-profile page 
 @staff_member_required(login_url='login')
 def myprofile(request):
-    profile, created = Profile.objects.get_or_create(user=request.user)
+    profile = Profile.objects.get(user=request.user)  # load profile first
 
     if request.method == "POST":
-        profile.gender = request.POST.get("gender")
-        profile.mobile = request.POST.get("mobile")
+        gender = request.POST.get("gender")
+        mobile = request.POST.get("mobile")
+
+        profile.gender = gender
+        profile.mobile = mobile
         profile.save()
-        return redirect("profile")
+
+        return redirect("profile")  
 
     return render(request, "my-profile.html", {"profile": profile})
 
 
-
-# save profile image
+# save profile image 
 def editprofile(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
-
+    
     if request.FILES.get("profile_picture"):
         profile.profile_picture = request.FILES["profile_picture"]
         profile.save()
         return redirect("my-profile")
-
     return render(request, "edit-profile.html", {"profile": profile})
 
 
+# delete image from my-profile and edit-profile
+
+#def deleteprofile(request):
+#    return render(request, "delete-profile.html")
 
 
 
-
-# delete profile image
 def deleteprofile(request):
-    profile, created = Profile.objects.get_or_create(user=request.user)
+    profile = Profile.objects.get(user=request.user)
 
     if request.method == "POST":
 
+        # delete file only if not default image
         if profile.profile_picture.name != "default/user_img.png":
             try:
                 os.remove(os.path.join(settings.MEDIA_ROOT, profile.profile_picture.name))
             except:
                 pass
 
+        # set profile image to default
         profile.profile_picture = "default/user_img.png"
         profile.save()
 
-        return redirect("my-profile")
+        return redirect("my-profile")   # after delete, go to my-profile
 
     return render(request, "delete-profile.html", {"profile": profile})
+

@@ -10,6 +10,7 @@
     <!-- User Info -->
     <div class="profile-top-section">
         <div class="profile-user">
+
            <img class="profile-img"
      src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}{% static 'images/user_img.png' %}{% endif %}"
      alt="Profile">
@@ -34,6 +35,7 @@
     
     <!-- Form Section -->
     <form method="POST">
+<<<<<<< HEAD
     {% csrf_token %}
 
     <div class="form-grid">
@@ -73,6 +75,43 @@
     </div>
 </form>
 
+=======
+        {% csrf_token %}
+
+        <div class="form-grid">
+  
+            <div>
+                <label>Username</label>
+                <input type="text" name="full_name" value="{{ user.username }}">
+            </div>
+            
+            <div>
+                <label>email</label>
+                <input type="text" name="nickname" value="{{ user.email }}" placeholder="Your Nickname">
+            </div>
+
+            <div>
+                <label>Gender</label>
+                <select name="gender">
+                    <option value="">Select Gender</option>
+                    <option value="Female" {% if profile.gender == "Female" %}selected{% endif %}>Female</option>
+                    <option value="Male" {% if profile.gender == "Male" %}selected{% endif %}>Male</option>
+                    <option value="Other" {% if profile.gender == "Other" %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Mobile</label>
+                <input type="text" name="mobile" id="mobile" class="form-input" value="{{ profile.mobile }}" pettern = "^\[0-9\-\s\.\(\)]*$" placeholder="Enter your mobile number" maxlength="10">
+            </div>
+
+
+        </div>
+        <div class="setting-save-btn">
+               <button type="submit" class="save-btn" >Save</button>
+        </div>
+    </form>
+>>>>>>> 711914099d040be334efa6cad7e01b0b3010851f
     
 
 </div>

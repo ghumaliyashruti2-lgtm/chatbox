@@ -13,11 +13,11 @@
 
     <div class="card">
         <div class="icon-container">
+
     <img class="profile-img"
          src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}{% static 'default/user_img.png' %}{% endif %}"
          alt="Profile">
 </div>
-
         <h3>Click on delete for delete your profile</h3>
 
         <form method="POST">

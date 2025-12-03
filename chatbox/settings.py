@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'chatbox.apps.ChatboxConfig',
-    'profiles.apps.ProfilesConfig',
+    'profiles',
 
 ]
 

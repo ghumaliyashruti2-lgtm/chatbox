@@ -7,9 +7,11 @@
         <div class="profile-card">
 
             <div class="profile-img">
+                
                 <img class="profile-img"
      src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}{% static 'images/user_img.png' %}{% endif %}"
      alt="Profile">
+
 
             </div>
 
