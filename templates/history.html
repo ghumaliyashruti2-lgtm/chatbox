@@ -1,0 +1,139 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>History</title>
+    <link rel="stylesheet" href="{% static 'css/history.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+<body>
+
+<div class="history-page">
+    <div class="layout">
+        <div class="main">
+
+            <div class="top-bar">
+
+                <div id="cleanPopup" class="simple-popup">
+                    <div class="simple-popup-box">
+                        <h3>Delete History?</h3>
+                        <p>This action will permanently remove your chat history.</p>
+
+                        <input type="hidden" id="cleanRange">
+
+                        <div class="simple-buttons">
+                            <button class="simple-cancel" onclick="closeCleanPopup()">Cancel</button>
+                            <button class="simple-delete" onclick="confirmCleanHistory()">Delete</button>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="top-left">
+                    <!-- Back Button -->
+                    <div class="back-btn">
+                         <a href=" {% url 'index' %}" style="color:white;">
+                            <i class="fa fa-arrow-left"></i>
+                        </a>
+                    </div>
+
+                    <!-- Search Bar -->
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Search messages..." oninput="searchHistory()">
+                    </div>
+
+                </div>
+
+                <div class="top-right">
+
+                    <!-- Sort Dropdown -->
+                    <select class="dropdown" id="sortSelect" onchange="sortHistory()">
+                        <option value="newest" {% if sort_option == 'newest' %}selected{% endif %}>Newest First</option>
+                        <option value="oldest" {% if sort_option == 'oldest' %}selected{% endif %}>Oldest First</option>
+                    </select>
+
+
+                    <!-- 3 Dots Menu -->
+                    <div class="dots-container">
+                        <div class="dots" onclick="toggleMenu()">&#8942;</div>
+
+                        <!-- Main Dropdown -->
+                        <div class="dots-menu" id="dotsMenu">
+
+                            <!-- Clean History Main Button -->
+                            <div class="menu-item submenu-toggle" onclick="toggleSubmenu(event)">
+                                Clean History ▸
+                            </div>
+
+                            <!-- Submenu -->
+                            <!-- submenu -->
+                            <div class="submenu" id="submenu">
+                                <div class="submenu-item" onclick="event.stopPropagation(); openCleanPopup('day')">Today</div>
+                                <div class="submenu-item" onclick="event.stopPropagation(); openCleanPopup('week')">This Week</div>
+                                <div class="submenu-item" onclick="event.stopPropagation(); openCleanPopup('month')">This Month</div>
+                                <div class="submenu-item" onclick="event.stopPropagation(); openCleanPopup('all')">All Time</div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <!-- Profile Image -->
+                    <a href="{% url 'profile' %}">
+                        <img src="{{ user_image|default:'/static/images/default.png' }}" class="profile-img">
+                    </a>
+
+                </div>
+
+
+
+            
+
+
+
+            </div>
+            
+
+            {% load tz %}
+
+                {% if grouped_history %}
+                    {% for date, items in grouped_history.items %}
+                        <div class="date-title">{{ date }}</div>
+
+                        {% for msg in items %}
+                            <div class="history-row history-wrapper">
+
+                                <div class="time">
+                                    {{ msg.created_at|localtime|time:"g:i A" }}
+                                </div>
+
+                                <div class="content">
+                                    <div class="user-msg history-msg">
+                                        {{ msg.user_message|linebreaksbr }}
+                                    </div>
+
+                                    <div class="bot-msg history-msg">
+                                        {{ msg.ai_message|linebreaksbr }}
+                                    </div>
+
+                                </div>
+                                <button class="delete-btn" type ="button" onclick="deleteHistory({{ msg.id }})">
+                                        <i class="fa fa-trash" style="font-size:24px color:#4BA3DE"></i>
+                                </button>
+
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                {% else %}
+                <div class="no-history">
+                    <p>No history found.</p>
+                </div>
+            {% endif %}
+
+
+        </div>
+    </div>
+<script src="{% static 'js/history.js'%}"></script>
+</body>
+</html>
