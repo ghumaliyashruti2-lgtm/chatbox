@@ -12,6 +12,82 @@ body {
 }
 
 /* ===============================
+  MARKDOWN LAYOUT
+================================ */
+ 
+.markdown-content {
+    line-height: 1.6;
+    font-size: 14px;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+    font-weight: 600;
+    margin: 10px 0;
+}
+
+.markdown-content pre {
+    background: #0f172a;
+    color: #e5e7eb;
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+.markdown-content code {
+    background: #1e293b;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+
+/* ✅ Table overflow fix */
+.markdown-content table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    border-collapse: collapse;
+}
+
+/* Optional: smooth scrollbar */
+.markdown-content table::-webkit-scrollbar {
+    height: 6px;
+}
+
+.markdown-content table::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+/* Cell styling */
+.markdown-content th,
+.markdown-content td {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+
+.markdown-content th,
+.markdown-content td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.markdown-content blockquote {
+    border-left: 4px solid #3b82f6;
+    padding-left: 10px;
+    color: #555;
+}
+
+
+/* ===============================
    CHAT LAYOUT (IMPORTANT FIX)
 ================================ */
 

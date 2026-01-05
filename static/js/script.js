@@ -80,6 +80,29 @@ function startCountdown(seconds) {
     }, 1000);
 }
 
+// ====================
+// MARKDOWN 
+// ====================
+
+marked.setOptions({
+    breaks: true,
+    gfm: true,
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".markdown-content[data-markdown]").forEach(el => {
+        const markdown = el.getAttribute("data-markdown");
+        if (!markdown) return;
+
+        const rawHtml = marked.parse(markdown);
+        const safeHtml = DOMPurify.sanitize(rawHtml);
+
+        el.innerHTML = safeHtml;
+    });
+});
+
+
+
 // ======================
 // SEND MESSAGE
 // ======================
@@ -174,26 +197,38 @@ async function sendMessage(e) {
             botMsg.className = "message bot";
 
             const botContent = document.createElement("div");
-            botContent.className = "message-content";
+            botContent.className = "message-content markdown-content";
 
             botMsg.appendChild(botContent);
             botWrapper.appendChild(botMsg);
             chatBody.appendChild(botWrapper);
             autoScroll();
 
-           while (true) {
+            let fullMarkdown = "";
+          while (true) {
                 const { value, done } = await reader.read();
                 if (done) break;
 
                 const chunk = decoder.decode(value, { stream: true });
 
-                // 🔥 Only hide dots when REAL text arrives
+                // 🔥 Hide typing only when real text arrives
                 if (!streamStarted && chunk.trim() !== "") {
                     streamStarted = true;
                     if (typing) typing.style.display = "none";
                 }
 
-                botContent.innerHTML += chunk.replace(/\n/g, "<br>");
+                // 1️⃣ Accumulate RAW markdown
+                fullMarkdown += chunk;
+
+                // 2️⃣ Convert markdown → HTML
+                const rawHtml = marked.parse(fullMarkdown);
+
+                // 3️⃣ Sanitize HTML
+                const safeHtml = DOMPurify.sanitize(rawHtml);
+
+                // 4️⃣ Render
+                botContent.innerHTML = safeHtml;
+
                 autoScroll();
             }
 
@@ -349,6 +384,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!localStorage.getItem("chatStartTime")) setChatStartTime();
 });
 
+function setChatStartTime(time) {
+    if (!time) return;
+
+    const el = document.getElementById("chatStartTime");
+    if (!el) return;
+
+    const date = new Date(time);
+    el.textContent = date.toLocaleString();
+}
+
 
 
 /***************************************************** HISTORY PAGE LOGIC **************************************/
@@ -481,4 +526,3 @@ function confirmCleanHistory() {
         .then(() => location.reload());
     }
 }
-

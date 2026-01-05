@@ -58,10 +58,9 @@
             {% else %}
                 <div class="chat-message bot-message">
                     <div class="message bot">
-                        <div class="message-content">
-                            {{ msg.content|linebreaksbr }}
+                        <div class="message-content markdown-content"
+                            data-markdown="{{ msg.content|escape }}">
                         </div>
-
                         <div class="message-actions">
                             <i class="fa fa-copy copy-btn"></i>
                         </div>
@@ -139,6 +138,12 @@
 
 
 </div>
+<!-- Markdown Parser -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<!-- XSS Protection -->
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+
 <script>
     window.REMAINING_MESSAGES = {{ remaining_messages }};
     window.REMAINING_SECONDS = {{ remaining_seconds|default:0 }};
