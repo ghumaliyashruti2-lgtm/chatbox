@@ -64,14 +64,30 @@ body {
     word-wrap: break-word;
 }
 
+.chat-image {
+    max-width: 240px;
+    border-radius: 8px;
+    margin-top: 8px;
+    margin-left: 69%;
+    position: relative;
+}
+
+.chat-text {
+    visibility: hidden;
+    position:absolute;
+}
+
+
 .message.user {
     background: #4BA3DE;
     color: #fff;
     margin-left: auto;
+    max-width: 55%;
 }
 
 .message.bot {
     background: #e4e6eb;
+    max-width: 55%;
 }
 
 /* Typing dots */

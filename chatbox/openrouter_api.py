@@ -7,8 +7,6 @@ logger = logging.getLogger(__name__)
 class OpenRouterChatbot:
     def __init__(self):
         self.api_key = settings.OPENROUTER_API_KEY
-
-        # ✅ CONFIRMED VISION MODEL
         self.model = "openai/gpt-4o-mini"
 
         self.client = OpenAI(
@@ -16,7 +14,7 @@ class OpenRouterChatbot:
             base_url="https://openrouter.ai/api/v1"
         )
 
-    def get_response(
+    def stream_response(
         self,
         user_input,
         conversation_history,
@@ -33,22 +31,19 @@ class OpenRouterChatbot:
                 }
             ]
 
-            # ✅ ADD OLD CHAT (TEXT ONLY)
+            # ✅ Previous messages
             for msg in conversation_history:
                 messages.append({
                     "role": msg["role"],
                     "content": msg["content"]
                 })
 
-            # 🔥 IMAGE + TEXT (CORRECT FORMAT)
+            # ✅ User message
             if image_base64:
                 messages.append({
                     "role": "user",
                     "content": [
-                        {
-                            "type": "text",
-                            "text": user_input or "Describe this image"
-                        },
+                        {"type": "text", "text": user_input or "Describe this image"},
                         {
                             "type": "image_url",
                             "image_url": {
@@ -63,15 +58,23 @@ class OpenRouterChatbot:
                     "content": user_input
                 })
 
-            response = self.client.chat.completions.create(
+            # 🔥 STREAMING CALL
+            stream = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
+                temperature=0.2,
                 max_tokens=600,
-                temperature=0.2
+                stream=True
             )
 
-            return response.choices[0].message.content
+            for chunk in stream:
+                if not chunk.choices:
+                    continue
+
+                delta = chunk.choices[0].delta
+                if delta and delta.content:
+                    yield delta.content  # ⬅ token by token
 
         except Exception as e:
-            logger.exception("AI error")
-            return f"Error communicating with AI: {str(e)}"
+            logger.exception("Streaming AI error")
+            yield f"\n[Error]: {str(e)}"

@@ -85,10 +85,14 @@ function startCountdown(seconds) {
 // ======================
 let isProcessing = false;
 let selectedFile = null;
+let streamStarted = false;
+
 
 async function sendMessage(e) {
     if (e) e.preventDefault();
     if (isProcessing) return;
+
+    streamStarted = false;
 
     const input = document.getElementById("userInput");
     const sendBtn = document.getElementById("sendBtn");
@@ -98,12 +102,18 @@ async function sendMessage(e) {
     const message = input.value.trim();
     if (!message && !selectedFile) return;
 
-    isProcessing = true;
-    input.disabled = true;
-    sendBtn.style.opacity = "0.6";
+    // 🚫 HARD LIMIT CHECK
+    if (window.REMAINING_MESSAGES <= 0) {
+        forceLimitReached(window.REMAINING_SECONDS);
+        return;
+    }
 
+    // ✅ USER MESSAGE
     chatBody.insertAdjacentHTML("beforeend", `
         <div class="chat-message user-message">
+           ${selectedFile && selectedFile.type.startsWith("image/")
+            ? `<img src="${URL.createObjectURL(selectedFile)}" class="chat-image" />`
+            : `<span class="chat-text">${message}</span>`}
             <div class="message user">
                 <div class="message-content">
                     ${message || "📎 " + selectedFile.name}
@@ -115,73 +125,113 @@ async function sendMessage(e) {
             </div>
         </div>
     `);
-
     autoScroll();
 
-    // ======================
-    // THEN SHOW TYPING DOTS
-    // ======================
+    // 🔵 TYPING INDICATOR
     if (typing) {
         typing.style.display = "flex";
         chatBody.appendChild(typing);
         autoScroll();
     }
 
+    isProcessing = true;
+    input.disabled = true;
+    sendBtn.style.opacity = "0.6";
 
     const formData = new FormData();
     formData.append("message", message);
-    if (selectedFile) formData.append("file", selectedFile);
+    formData.append("chat_id", window.CHAT_ID);
 
-    try {
-        const res = await fetch("/chatbot/chatbot/", {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": getCookie("csrftoken"),
-                "X-Requested-With": "XMLHttpRequest"
-            },
-            body: formData
-        });
-
-        if (typing) typing.style.display = "none";
-
-        if (res.status === 403) {
-            const data = await res.json();
-            forceLimitReached(data.remaining_seconds);
-            return;
-        }
-
-        const data = await res.json();
-
-        chatBody.insertAdjacentHTML("beforeend", `
-            <div class="chat-message bot-message">
-                <div class="message bot">
-                    <div class="message-content">
-                        ${data.reply.replace(/\n/g, "<br>")}
-                        <div class="message-actions">
-                            <i class="fa fa-copy copy-btn"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `);
-            
-        autoScroll();
-
-    } catch (err) {
-        console.error(err);
+    // 🔥 IMAGE SUPPORT FOR STREAMING
+    if (selectedFile && selectedFile.type.startsWith("image/")) {
+        const base64Image = await fileToBase64(selectedFile);
+        formData.append("image_base64", base64Image);
     }
 
+
+    try {
+            const res = await fetch("/chatbot/stream/", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken")
+            },
+            body: formData
+            });
+
+            if (!res.ok) {
+                throw new Error("Server error " + res.status);
+            }
+
+
+            // ✅ CREATE BOT MESSAGE BOX ONCE
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder();
+
+            const botWrapper = document.createElement("div");
+            botWrapper.className = "chat-message bot-message";
+
+            const botMsg = document.createElement("div");
+            botMsg.className = "message bot";
+
+            const botContent = document.createElement("div");
+            botContent.className = "message-content";
+
+            botMsg.appendChild(botContent);
+            botWrapper.appendChild(botMsg);
+            chatBody.appendChild(botWrapper);
+            autoScroll();
+
+           while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value, { stream: true });
+
+                // 🔥 Only hide dots when REAL text arrives
+                if (!streamStarted && chunk.trim() !== "") {
+                    streamStarted = true;
+                    if (typing) typing.style.display = "none";
+                }
+
+                botContent.innerHTML += chunk.replace(/\n/g, "<br>");
+                autoScroll();
+            }
+
+            window.REMAINING_MESSAGES--;
+
+        } catch (err) {
+            console.error("Streaming error:", err);
+            if (typing) typing.style.display = "none";
+        }
+
+
+    // 🔄 RESET
     isProcessing = false;
     input.disabled = false;
     sendBtn.style.opacity = "1";
     input.value = "";
     selectedFile = null;
+    streamStarted = false;
     document.getElementById("fileInput").value = "";
 }
 
 // ======================
 // FILE UPLOAD
 // ======================
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const base64 = reader.result.split(",")[1];
+            resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+
+
 function uploadFile() {
     const fileInput = document.getElementById("fileInput");
     const userInput = document.getElementById("userInput");

@@ -29,7 +29,7 @@ SECRET_KEY =  env("SECRET_KEY")
 DEBUG = env.bool("DEBUG")
 
 OPENROUTER_API_KEY = env("OPENROUTER_API_KEY")
-OPENROUTER_MODEL = env("OPENROUTER_MODEL", default="openai/gpt-4o-mini")
+OPENROUTER_MODEL = env("OPENROUTER_MODEL", default="oopenai/gpt-4.1-mini")
 
 ALLOWED_HOSTS = []
 

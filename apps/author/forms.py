@@ -25,11 +25,26 @@ class SignupForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
+
+        # Split full name into first_name and last_name
+        full_name = self.cleaned_data.get("first_name", "")
+        name_parts = full_name.strip().split()
+        if len(name_parts) == 0:
+            user.first_name = ""
+            user.last_name = ""
+        elif len(name_parts) == 1:
+            user.first_name = name_parts[0]
+            user.last_name = ""
+        else:
+            user.first_name = name_parts[0]
+            user.last_name = " ".join(name_parts[1:])  # everything else goes to last_name
+
         user.username = self.cleaned_data["email"]
         user.set_password(self.cleaned_data["password"])
+
         if commit:
             user.save()
-        return user   # ✅ FIXED
+        return user
 
 
 class LoginForm(forms.Form):

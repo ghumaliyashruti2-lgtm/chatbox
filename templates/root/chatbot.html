@@ -35,11 +35,20 @@
         {% for msg in conversation %}
             {% if msg.role == "user" %}
                 <div class="chat-message user-message">
+                    {% if msg.file %}
+                        {% if msg.is_image %}
+                            <img src="{{ msg.file }}" class="chat-image">
+                        {% else %}
+                            <a href="{{ msg.file }}" target="_blank">
+                                📎 {{ msg.file_name }}
+                            </a>
+                        {% endif %}
+                    {% endif %}
+
                     <div class="message user">
                         <div class="message-content">
                             {{ msg.content }}
                         </div>
-
                         <div class="message-actions">
                             <i class="fa fa-edit edit-btn"></i>
                             <i class="fa fa-copy copy-btn"></i>
@@ -93,7 +102,6 @@
             <input
                 type="text"
                 id="userInput"
-                placeholder="Message"
                 autocomplete="off"
                 autofocus
                 {% if limit_reached %}disabled{% endif %}
@@ -132,6 +140,7 @@
 
 </div>
 <script>
+    window.REMAINING_MESSAGES = {{ remaining_messages }};
     window.REMAINING_SECONDS = {{ remaining_seconds|default:0 }};
     window.CHAT_ID = "{{ chat_id }}";
 </script>

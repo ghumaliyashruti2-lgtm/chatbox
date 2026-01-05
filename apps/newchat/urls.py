@@ -1,11 +1,12 @@
-from django.contrib import admin
-from django.urls import path
-from apps.newchat import views
+
 from django.conf import settings
 from django.conf.urls.static import static  
+from django.urls import path
+from . import views
 
 urlpatterns = [
-    path("chatbot/", views.new_chatbot,name="chatbot"),
+    path("", views.new_chatbot, name="chatbot"),
+    path("stream/", views.stream_chatbot, name="stream_chatbot"),
 ]
 
 if settings.DEBUG:
