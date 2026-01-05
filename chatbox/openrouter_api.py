@@ -4,10 +4,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class OpenRouterChatbot:
-    def __init__(self):
+    def __init__(self, model=None):
         self.api_key = settings.OPENROUTER_API_KEY
-        self.model = "openai/gpt-4o-mini"
+
+        # ✅ Default model fallback
+        self.model = model or "openai/gpt-4o-mini"
 
         self.client = OpenAI(
             api_key=self.api_key,
@@ -15,11 +18,13 @@ class OpenRouterChatbot:
         )
 
     def stream_response(
-        self,
-        user_input,
-        conversation_history,
-        image_base64=None
+    self,
+    user_input,
+    conversation_history,
+    image_base64=None,
+    model=None
     ):
+
         try:
             messages = [
                 {
@@ -58,14 +63,16 @@ class OpenRouterChatbot:
                     "content": user_input
                 })
 
-            # 🔥 STREAMING CALL
+            model = model or self.model
+
             stream = self.client.chat.completions.create(
-                model=self.model,
+                model=model,
                 messages=messages,
                 temperature=0.2,
                 max_tokens=600,
                 stream=True
             )
+
 
             for chunk in stream:
                 if not chunk.choices:
@@ -73,7 +80,7 @@ class OpenRouterChatbot:
 
                 delta = chunk.choices[0].delta
                 if delta and delta.content:
-                    yield delta.content  # ⬅ token by token
+                    yield delta.content
 
         except Exception as e:
             logger.exception("Streaming AI error")

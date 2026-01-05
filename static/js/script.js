@@ -121,6 +121,8 @@ async function sendMessage(e) {
     const sendBtn = document.getElementById("sendBtn");
     const chatBody = document.getElementById("chatBody");
     const typing = document.getElementById("typingIndicator");
+    const modelSelect = document.getElementById("modelSelect");
+
 
     const message = input.value.trim();
     if (!message && !selectedFile) return;
@@ -164,6 +166,8 @@ async function sendMessage(e) {
     const formData = new FormData();
     formData.append("message", message);
     formData.append("chat_id", window.CHAT_ID);
+    formData.append("model", modelSelect.value);
+
 
     // 🔥 IMAGE SUPPORT FOR STREAMING
     if (selectedFile && selectedFile.type.startsWith("image/")) {
@@ -238,6 +242,9 @@ async function sendMessage(e) {
             console.error("Streaming error:", err);
             if (typing) typing.style.display = "none";
         }
+
+        
+
 
 
     // 🔄 RESET

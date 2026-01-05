@@ -16,6 +16,14 @@
             </a>
             <span>Elixir Techne Help Desk</span>
         </div>
+        <!-- Model Selector -->
+        <select id="modelSelect" class="model-select">
+            <option value="openai/gpt-4o-mini">GPT-4o Mini (Fast)</option>
+            <option value="openai/gpt-4o">GPT-4o (Smart)</option>
+            <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+        </select>
+
+
 
         <div class="header-profile mobile-only">
             <a href="{% url 'profiles:profile' %}">

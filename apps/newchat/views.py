@@ -12,7 +12,6 @@ from apps.history.models import History
 from apps.profiles.models import Profile
 from chatbox.openrouter_api import OpenRouterChatbot
 
-chatbot_engine = OpenRouterChatbot()
 
 # =====================
 # CHAT LIMIT CONFIG
@@ -99,6 +98,9 @@ def new_chatbot(request):
     # =====================
     # AJAX MESSAGE SEND
     # =====================
+    # =====================
+    # AJAX MESSAGE SEND
+    # =====================
     if request.method == "POST" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
 
         if limit_reached:
@@ -110,6 +112,12 @@ def new_chatbot(request):
         try:
             message = request.POST.get("message", "").strip()
             uploaded_file = request.FILES.get("file")
+
+            # ✅ MODEL FROM DROPDOWN
+            model = request.POST.get("model", "openai/gpt-4o-mini")
+
+            chatbot_engine = OpenRouterChatbot(model=model)
+
 
             # ✅ DEFAULT PROMPT FOR IMAGE-ONLY MESSAGE
             ai_message = message or "Describe this image"
@@ -189,11 +197,16 @@ def new_chatbot(request):
 
 @csrf_exempt
 @login_required(login_url="login")
+@csrf_exempt
+@login_required(login_url="login")
 def stream_chatbot(request):
 
     message = request.POST.get("message", "").strip()
     chat_id = request.POST.get("chat_id")
     image_base64 = request.POST.get("image_base64")
+
+    # ✅ MODEL FROM FRONTEND
+    model = request.POST.get("model", "openai/gpt-4o-mini")
 
     if not chat_id:
         return StreamingHttpResponse("Missing chat_id", status=400)
@@ -217,14 +230,19 @@ def stream_chatbot(request):
                 "content": item.ai_message
             })
 
+    # ✅ CREATE CHATBOT PER REQUEST
+    chatbot_engine = OpenRouterChatbot(model=model)
+
     def event_stream():
         full_reply = ""
 
         for token in chatbot_engine.stream_response(
             user_input=message or "Describe this image",
             conversation_history=conversation,
-            image_base64=image_base64
+            image_base64=image_base64,
+            model=model
         ):
+
             full_reply += token
             yield token
 

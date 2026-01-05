@@ -42,6 +42,7 @@ body {
     background: #1e293b;
     padding: 2px 6px;
     border-radius: 4px;
+    color: #e5e7eb;
 }
 
 
@@ -84,6 +85,27 @@ body {
     border-left: 4px solid #3b82f6;
     padding-left: 10px;
     color: #555;
+}
+
+
+
+/* model select dropdown */
+
+.model-select {
+    padding: 6px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    margin-right: 6px;
+    background: white;
+    cursor: pointer;
+    border: none;
+}
+
+.model-selct:active,
+.model-select:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
 }
 
 
