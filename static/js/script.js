@@ -84,11 +84,6 @@ function startCountdown(seconds) {
 // MARKDOWN 
 // ====================
 
-marked.setOptions({
-    breaks: true,
-    gfm: true,
-});
-
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".markdown-content[data-markdown]").forEach(el => {
         const markdown = el.getAttribute("data-markdown");
@@ -243,9 +238,6 @@ async function sendMessage(e) {
             if (typing) typing.style.display = "none";
         }
 
-        
-
-
 
     // 🔄 RESET
     isProcessing = false;
@@ -271,8 +263,6 @@ function fileToBase64(file) {
         reader.readAsDataURL(file);
     });
 }
-
-
 
 function uploadFile() {
     const fileInput = document.getElementById("fileInput");
@@ -382,25 +372,6 @@ function previewImage(event) {
     if (!img) return;
     img.src = URL.createObjectURL(event.target.files[0]);
 }
-
-// ======================
-// PAGE LOAD
-// ======================
-document.addEventListener("DOMContentLoaded", () => {
-    autoScroll();
-    if (!localStorage.getItem("chatStartTime")) setChatStartTime();
-});
-
-function setChatStartTime(time) {
-    if (!time) return;
-
-    const el = document.getElementById("chatStartTime");
-    if (!el) return;
-
-    const date = new Date(time);
-    el.textContent = date.toLocaleString();
-}
-
 
 
 /***************************************************** HISTORY PAGE LOGIC **************************************/
