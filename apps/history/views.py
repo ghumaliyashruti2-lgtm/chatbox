@@ -39,10 +39,16 @@ def view_history(request):
     for chat_id, msgs in chat_groups.items():
         first_msg = msgs[0]
 
+        is_image = (
+            first_msg.uploaded_file and
+            first_msg.uploaded_file.name.lower().endswith((".jpg", ".jpeg", ".png", ".webp"))
+        )
+
         history_groups.append({
             "chat_id": chat_id,
             "start_time": first_msg.created_at,
-            "preview": first_msg.user_message[:60],
+            "preview": first_msg.user_message[:60] if first_msg.user_message else "📷 Image",
+            "image_url": first_msg.uploaded_file.url if is_image else None,
             "count": len(msgs),
             "from_time": first_msg.created_at.isoformat(),
         })

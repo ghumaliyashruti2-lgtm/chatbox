@@ -195,8 +195,7 @@ def new_chatbot(request):
         "remaining_messages": remaining_messages,
     })
 
-@csrf_exempt
-@login_required(login_url="login")
+
 @csrf_exempt
 @login_required(login_url="login")
 def stream_chatbot(request):
@@ -204,6 +203,8 @@ def stream_chatbot(request):
     message = request.POST.get("message", "").strip()
     chat_id = request.POST.get("chat_id")
     image_base64 = request.POST.get("image_base64")
+    uploaded_file = request.FILES.get("file")
+
 
     # ✅ MODEL FROM FRONTEND
     model = request.POST.get("model", "openai/gpt-4o-mini")
@@ -248,11 +249,13 @@ def stream_chatbot(request):
 
         # ✅ SAVE HISTORY AFTER STREAM
         History.objects.create(
-            user=request.user,
-            chat_id=chat_id,
-            user_message=message,
-            ai_message=full_reply
+        user=request.user,
+        chat_id=chat_id,
+        user_message=message,
+        ai_message=full_reply,
+        uploaded_file=uploaded_file  # ✅ THIS FIXES REFRESH ISSUE
         )
+
 
     return StreamingHttpResponse(
         event_stream(),

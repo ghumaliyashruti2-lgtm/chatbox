@@ -168,6 +168,7 @@ async function sendMessage(e) {
     if (selectedFile && selectedFile.type.startsWith("image/")) {
         const base64Image = await fileToBase64(selectedFile);
         formData.append("image_base64", base64Image);
+        formData.append("file", selectedFile);
     }
 
 

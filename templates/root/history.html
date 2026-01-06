@@ -110,7 +110,12 @@
                             {{ chat.start_time|localtime|time:"g:i A" }}
                         </div>
                         <div class="user-msg history-msg">
-                            {{ chat.preview }}...
+                            {% if chat.image_url %}
+                                <img src="{{ chat.image_url }}" class="history-thumb">
+                                <span>Image</span>
+                            {% else %}
+                                {{ chat.preview }}...
+                            {% endif %}
                         </div>
                     </div>
                 </a>
