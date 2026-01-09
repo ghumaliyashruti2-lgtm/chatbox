@@ -1,11 +1,10 @@
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, StreamingHttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from datetime import timedelta
-import uuid, base64
-from django.http import StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from datetime import timedelta
+import uuid, base64, traceback
 
 from apps.newchat.forms import ChatbotMessageForm
 from apps.history.models import History
@@ -40,7 +39,7 @@ def new_chatbot(request):
         request.session["chat_id"] = chat_id
         is_new_chat = False
 
-    profile = Profile.objects.get(user=request.user)
+    profile, _ = Profile.objects.get_or_create(user=request.user)
 
     # =====================
     # FETCH CHAT HISTORY
@@ -58,14 +57,7 @@ def new_chatbot(request):
                 conversation.append({
                     "role": "user",
                     "content": item.user_message,
-                    "file": item.uploaded_file.url if item.uploaded_file else None,
-                    "file_name": item.uploaded_file.name.split("/")[-1] if item.uploaded_file else None,
-                    "is_image": (
-                        item.uploaded_file.name.lower().endswith((".jpg", ".png", ".jpeg"))
-                        if item.uploaded_file else False
-                    )
                 })
-
             if item.ai_message:
                 conversation.append({
                     "role": "assistant",
@@ -96,12 +88,9 @@ def new_chatbot(request):
         remaining_seconds = int((expiry_time - now).total_seconds())
 
     # =====================
-    # AJAX MESSAGE SEND
+    # AJAX MESSAGE SEND (NON-STREAM)
     # =====================
-    # =====================
-    # AJAX MESSAGE SEND
-    # =====================
-    if request.method == "POST" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
+    if request.method == "POST" and request.headers.get("X-Requested-With"):
 
         if limit_reached:
             return JsonResponse({
@@ -110,18 +99,15 @@ def new_chatbot(request):
             })
 
         try:
+            # ✅ ALWAYS DEFINE FIRST
             message = request.POST.get("message", "").strip()
             uploaded_file = request.FILES.get("file")
+            image_base64 = request.POST.get("image_base64")
 
-            # ✅ MODEL FROM DROPDOWN
             model = request.POST.get("model", "openai/gpt-4o-mini")
-
             chatbot_engine = OpenRouterChatbot(model=model)
 
-
-            # ✅ DEFAULT PROMPT FOR IMAGE-ONLY MESSAGE
             ai_message = message or "Describe this image"
-            image_base64 = None
             file_for_db = None
 
             if uploaded_file:
@@ -149,10 +135,7 @@ def new_chatbot(request):
             )
 
             if not form.is_valid():
-                return JsonResponse(
-                    {"error": form.errors},
-                    status=400
-                )
+                return JsonResponse({"error": form.errors}, status=400)
 
             reply = form.save(
                 bot_engine=chatbot_engine,
@@ -160,24 +143,13 @@ def new_chatbot(request):
                 image_base64=image_base64
             )
 
-            # ✅ SAFE FILE URL (NO 500 ERROR)
-            file_url = None
-            if file_for_db and hasattr(file_for_db, "url"):
-                file_url = file_for_db.url
-
             return JsonResponse({
                 "reply": reply or "",
-                "file_url": file_url,
-                "file_name": (
-                    file_for_db.name.split("/")[-1]
-                    if file_for_db else None
-                ),
                 "limit_reached": False
             })
 
         except Exception as e:
-            # 🔥 NEVER RETURN HTML ERROR TO JS
-            print("CHATBOT ERROR:", str(e))
+            traceback.print_exc()
             return JsonResponse(
                 {"error": "Server error", "detail": str(e)},
                 status=500
@@ -196,68 +168,119 @@ def new_chatbot(request):
     })
 
 
+# =====================
+# STREAMING VIEW
+# =====================
 @csrf_exempt
 @login_required(login_url="login")
 def stream_chatbot(request):
+    """
+    Streaming chatbot response (Server-Sent like plain text stream)
+    """
 
-    message = request.POST.get("message", "").strip()
-    chat_id = request.POST.get("chat_id")
-    image_base64 = request.POST.get("image_base64")
-    uploaded_file = request.FILES.get("file")
+    if request.method != "POST":
+        return StreamingHttpResponse("Invalid request", status=405)
 
+    try:
+        # =====================
+        # SAFE INPUT HANDLING
+        # =====================
+        message = request.POST.get("message", "").strip()
+        chat_id = request.POST.get("chat_id")
+        image_base64 = request.POST.get("image_base64")
+        uploaded_file = request.FILES.get("file")
 
-    # ✅ MODEL FROM FRONTEND
-    model = request.POST.get("model", "openai/gpt-4o-mini")
+        # Model from frontend
+        model = request.POST.get("model", "openai/gpt-4o-mini")
 
-    if not chat_id:
-        return StreamingHttpResponse("Missing chat_id", status=400)
+        if not chat_id:
+            return StreamingHttpResponse("Missing chat_id", status=400)
 
-    # Load history
-    db_history = History.objects.filter(
-        user=request.user,
-        chat_id=chat_id
-    ).order_by("created_at")
+        # =====================
+        # LOAD CHAT HISTORY
+        # =====================
+        db_history = History.objects.filter(
+            user=request.user,
+            chat_id=chat_id
+        ).order_by("created_at")
 
-    conversation = []
-    for item in db_history:
-        if item.user_message:
-            conversation.append({
-                "role": "user",
-                "content": item.user_message
-            })
-        if item.ai_message:
-            conversation.append({
-                "role": "assistant",
-                "content": item.ai_message
-            })
+        conversation = []
+        for item in db_history:
+            if item.user_message:
+                conversation.append({
+                    "role": "user",
+                    "content": item.user_message
+                })
+            if item.ai_message:
+                conversation.append({
+                    "role": "assistant",
+                    "content": item.ai_message
+                })
 
-    # ✅ CREATE CHATBOT PER REQUEST
-    chatbot_engine = OpenRouterChatbot(model=model)
+        # =====================
+        # FILE / IMAGE HANDLING
+        # =====================
+        final_prompt = message or "Describe this image"
 
-    def event_stream():
-        full_reply = ""
+        if uploaded_file:
+            if uploaded_file.content_type.startswith("image"):
+                image_base64 = base64.b64encode(
+                    uploaded_file.read()
+                ).decode("utf-8")
+                uploaded_file.seek(0)
 
-        for token in chatbot_engine.stream_response(
-            user_input=message or "Describe this image",
-            conversation_history=conversation,
-            image_base64=image_base64,
-            model=model
-        ):
+            elif uploaded_file.content_type.startswith("text"):
+                text = uploaded_file.read().decode(errors="ignore")[:1000]
+                uploaded_file.seek(0)
+                final_prompt += f"\n\n[Text File]\n{text}"
 
-            full_reply += token
-            yield token
+            else:
+                final_prompt += f"\n\n[File]\n{uploaded_file.name}"
 
-        # ✅ SAVE HISTORY AFTER STREAM
-        History.objects.create(
-        user=request.user,
-        chat_id=chat_id,
-        user_message=message,
-        ai_message=full_reply,
-        uploaded_file=uploaded_file  # ✅ THIS FIXES REFRESH ISSUE
+        # =====================
+        # INIT CHATBOT
+        # =====================
+        chatbot_engine = OpenRouterChatbot(model=model)
+
+        # =====================
+        # STREAM GENERATOR
+        # =====================
+        def event_stream():
+            full_reply = ""
+
+            try:
+                for token in chatbot_engine.stream_response(
+                    user_input=final_prompt,
+                    conversation_history=conversation,
+                    image_base64=image_base64,
+                    model=model
+                ):
+                    full_reply += token
+                    yield token
+
+            except Exception as e:
+                yield f"\n\n[Error: {str(e)}]"
+
+            finally:
+                # =====================
+                # SAVE CHAT HISTORY
+                # =====================
+                History.objects.create(
+                    user=request.user,
+                    chat_id=chat_id,
+                    user_message=message,
+                    ai_message=full_reply,
+                    uploaded_file=uploaded_file
+                )
+
+        return StreamingHttpResponse(
+            event_stream(),
+            content_type="text/plain"
         )
 
-
-    return StreamingHttpResponse(
-        event_stream(),
-        content_type="text/plain"
-    )
+    except Exception as e:
+        traceback.print_exc()
+        return StreamingHttpResponse(
+            f"Server error: {str(e)}",
+            status=500
+        )

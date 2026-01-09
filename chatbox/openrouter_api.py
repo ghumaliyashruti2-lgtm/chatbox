@@ -4,8 +4,27 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class OpenRouterChatbot:
+    
+    # TURN OFF STREAMING DATA FUNCTION 
+    def get_response(self, user_input, conversation_history=None, image_base64=None):
+        """
+        NON-STREAM RESPONSE (used when streaming OFF)
+        """
+
+        full_reply = ""
+
+        for token in self.stream_response(
+            user_input=user_input,
+            conversation_history=conversation_history,
+            image_base64=image_base64,
+            model=self.model
+        ):
+            full_reply += token
+
+        return full_reply
+    
+    
     def __init__(self, model=None):
         self.api_key = settings.OPENROUTER_API_KEY
 
@@ -85,3 +104,5 @@ class OpenRouterChatbot:
         except Exception as e:
             logger.exception("Streaming AI error")
             yield f"\n[Error]: {str(e)}"
+
+

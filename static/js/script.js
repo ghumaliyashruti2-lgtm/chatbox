@@ -105,7 +105,6 @@ let isProcessing = false;
 let selectedFile = null;
 let streamStarted = false;
 
-
 async function sendMessage(e) {
     if (e) e.preventDefault();
     if (isProcessing) return;
@@ -117,7 +116,7 @@ async function sendMessage(e) {
     const chatBody = document.getElementById("chatBody");
     const typing = document.getElementById("typingIndicator");
     const modelSelect = document.getElementById("modelSelect");
-
+    const isStreaming = document.getElementById("streamToggle").checked;
 
     const message = input.value.trim();
     if (!message && !selectedFile) return;
@@ -131,27 +130,22 @@ async function sendMessage(e) {
     // ✅ USER MESSAGE
     chatBody.insertAdjacentHTML("beforeend", `
         <div class="chat-message user-message">
-           ${selectedFile && selectedFile.type.startsWith("image/")
-            ? `<img src="${URL.createObjectURL(selectedFile)}" class="chat-image" />`
-            : `<span class="chat-text">${message}</span>`}
+            ${selectedFile && selectedFile.type.startsWith("image/")
+                ? `<img src="${URL.createObjectURL(selectedFile)}" class="chat-image" />`
+                : `<span class="chat-text">${message}</span>`}
             <div class="message user">
                 <div class="message-content">
                     ${message || "📎 " + selectedFile.name}
-                    <div class="message-actions">
-                        <i class="fa fa-edit edit-btn"></i>
-                        <i class="fa fa-copy copy-btn"></i>
-                    </div>
                 </div>
             </div>
         </div>
     `);
     autoScroll();
 
-    // 🔵 TYPING INDICATOR
+    // 🔵 Typing indicator
     if (typing) {
         typing.style.display = "flex";
         chatBody.appendChild(typing);
-        autoScroll();
     }
 
     isProcessing = true;
@@ -163,30 +157,59 @@ async function sendMessage(e) {
     formData.append("chat_id", window.CHAT_ID);
     formData.append("model", modelSelect.value);
 
-
-    // 🔥 IMAGE SUPPORT FOR STREAMING
     if (selectedFile && selectedFile.type.startsWith("image/")) {
         const base64Image = await fileToBase64(selectedFile);
         formData.append("image_base64", base64Image);
         formData.append("file", selectedFile);
     }
 
-
     try {
-            const res = await fetch("/chatbot/stream/", {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": getCookie("csrftoken")
-            },
-            body: formData
+        let res;
+
+        // 🔀 MODE SWITCH
+        if (isStreaming) {
+            res = await fetch("/chatbot/stream/", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                body: formData
             });
+        } else {
+            res = await fetch("", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                body: formData
+            });
+        }
 
-            if (!res.ok) {
-                throw new Error("Server error " + res.status);
-            }
+        if (!res.ok) {
+            throw new Error("Server error " + res.status);
+        }
 
+        // 🧊 NON-STREAMING
+        if (!isStreaming) {
+            const data = await res.json();
+            if (typing) typing.style.display = "none";
 
-            // ✅ CREATE BOT MESSAGE BOX ONCE
+            const botWrapper = document.createElement("div");
+            botWrapper.className = "chat-message bot-message";
+            botWrapper.innerHTML = `
+                <div class="message bot">
+                    <div class="message-content markdown-content">
+                        ${DOMPurify.sanitize(marked.parse(data.reply || ""))}
+                    </div>
+                </div>
+            `;
+            chatBody.appendChild(botWrapper);
+            autoScroll();
+        }
+
+        // 🔥 STREAMING
+        if (isStreaming) {
             const reader = res.body.getReader();
             const decoder = new TextDecoder();
 
@@ -202,45 +225,34 @@ async function sendMessage(e) {
             botMsg.appendChild(botContent);
             botWrapper.appendChild(botMsg);
             chatBody.appendChild(botWrapper);
-            autoScroll();
 
             let fullMarkdown = "";
-          while (true) {
+
+            while (true) {
                 const { value, done } = await reader.read();
                 if (done) break;
 
                 const chunk = decoder.decode(value, { stream: true });
 
-                // 🔥 Hide typing only when real text arrives
-                if (!streamStarted && chunk.trim() !== "") {
+                if (!streamStarted && chunk.trim()) {
                     streamStarted = true;
                     if (typing) typing.style.display = "none";
                 }
 
-                // 1️⃣ Accumulate RAW markdown
                 fullMarkdown += chunk;
-
-                // 2️⃣ Convert markdown → HTML
-                const rawHtml = marked.parse(fullMarkdown);
-
-                // 3️⃣ Sanitize HTML
-                const safeHtml = DOMPurify.sanitize(rawHtml);
-
-                // 4️⃣ Render
-                botContent.innerHTML = safeHtml;
-
+                botContent.innerHTML = DOMPurify.sanitize(marked.parse(fullMarkdown));
                 autoScroll();
             }
-
-            window.REMAINING_MESSAGES--;
-
-        } catch (err) {
-            console.error("Streaming error:", err);
-            if (typing) typing.style.display = "none";
         }
 
+        window.REMAINING_MESSAGES--;
 
-    // 🔄 RESET
+    } catch (err) {
+        console.error("Chat error:", err);
+        if (typing) typing.style.display = "none";
+    }
+
+    // 🔄 RESET (ALWAYS RUNS)
     isProcessing = false;
     input.disabled = false;
     sendBtn.style.opacity = "1";

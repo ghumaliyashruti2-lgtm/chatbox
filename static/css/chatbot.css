@@ -87,6 +87,80 @@ body {
     color: #555;
 }
 
+/* stream option */
+
+/* Streaming toggle container */
+.stream-toggle {
+    display: flex;
+    gap: 0px;
+    margin-left: auto;
+    font-family: Arial, sans-serif;
+}
+
+/* Hide default checkbox */
+.stream-toggle input[type="checkbox"] {
+    display: none;
+}
+
+/* Toggle background */
+.stream-toggle label {
+    display: flex;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Toggle switch */
+.stream-toggle label span {
+    position: relative;
+    padding-left: 55px;
+    font-size: 14px;
+    color: #444;
+}
+
+/* Switch track */
+.stream-toggle label span::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 24px;
+    background: #ccc;
+    border-radius: 50px;
+    transition: background 0.3s ease;
+}
+
+/* Switch knob */
+.stream-toggle label span::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* ON state */
+.stream-toggle input[type="checkbox"]:checked + span::before {
+    background: #555;
+    color: #555;
+}
+
+.stream-toggle input[type="checkbox"]:checked + span::after {
+    left: 23px;
+}
+
+/* OFF text color */
+.stream-toggle input[type="checkbox"]:not(:checked) + span {
+    color: #ccc;
+    
+}
 
 
 /* model select dropdown */
