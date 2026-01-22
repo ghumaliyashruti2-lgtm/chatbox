@@ -5,48 +5,90 @@
             <div class="signup-container">
                   <img src ="/static/images/Elixire_logo.png" >
                   <h2>Sign up</h2>
-                  <form method = "POST" action = "{% url 'signup' %}">
-                        {% csrf_token %}    
-                        {% if error %}
+                  <form method="POST" action="{% url 'signup' %}">
+                        {% csrf_token %}
 
-                              <div class="form-group alert alert-danger">
-                                    Please enter value
+                        {% if form.non_field_errors %}
+                              <div class="alert alert-danger" role="alert">
+                                    {% for error in form.non_field_errors %}
+                                          {{ error }}
+                                    {% endfor %}
                               </div>
+                        {% endif %}
+
+
+                        <!-- Full Name -->
+                        <div class="input-group">
+                        <label >Full Name</label>
+                        <input type="text" name="first_name"  placeholder="Enter your full name"
+                              value="{{ form.first_name.value|default_if_none:'' }}" required>
+                        </div>
+                        {% if form.first_name.errors %}
+                              <div class="alert alert-danger">{{ form.first_name.errors.0 }}</div>
+                        {% endif %}
                         
+
+                        <!-- Email -->
+                        <div class="input-group">
+                        <label >Email</label>
+                        <input type="email" name="email" placeholder="Enter your email"
+                              value="{{ form.email.value|default_if_none:'' }}" required>
+                        </div>
+                        {% if form.email.errors %}
+                              <div class="alert alert-danger">{{ form.email.errors.0 }}</div>
                         {% endif %}
-                        {% if user_exits_error %}
-                              <div class="alert alert-danger" role="alert" >
-                                    User name is Already Exits !                                
+
+                        <!-- Password -->
+                        <div class="input-group">
+                              <label for="id_password">Password</label>
+
+                              <div class="password-wrapper">
+                                    <input
+                                          type="password"
+                                          name="password"
+                                          id="id_password"
+                                          placeholder="Create password"
+                                          required
+                                          maxlength="8">
+
+                                    <span class="toggle-password" onclick="togglePassword('id_password', this)">
+                                          <i class='fas fa-eye' style="font-size:14px"></i> 
+                                    </span>
                               </div>
-                        {% endif %}
-                        <div class="input-group">
-                              <label> Name</label>
-                              <input type="text" name="first_name" placeholder="Enter your full name" required >  
                         </div>
-                        {% if email_exits_error %}
-                              <div class="alert alert-danger" role="alert" >
-                                    Email is Already Exits !                          
+                             
+                        {% if form.password.errors %}
+                              <div class="alert alert-danger">{{ form.password.errors.0 }}</div>
+                        {% endif %}
+                        
+
+                        <!-- Confirm Password -->
+                        <div class="input-group">
+                              <label for="id_confirm_password">Confirm Password</label>
+
+                              <div class="password-wrapper">
+                                    <input
+                                          type="password"
+                                          name="confirm_password"
+                                          id="id_confirm_password"
+                                          placeholder="Re-enter password"
+                                          required
+                                          maxlength="8">
+
+                                    <span class="toggle-password" onclick="togglePassword('id_confirm_password', this)">
+                                          <i class='fas fa-eye' style="font-size:14px"></i> 
+                                    </span>
                               </div>
+                        </div>
+
+                        {% if form.confirm_password.errors %}
+                              <div class="alert alert-danger">{{ form.confirm_password.errors.0 }}</div>
                         {% endif %}
-                        <div class="input-group">
-                              <label>Email</label>
-                              <input type="email" name = "email" placeholder="Enter your email" required>
-                        </div>
-                        <div class="input-group">
-                              <label>Password</label>
-                              <input type="password" name = "password" maxlength="8" placeholder="Create password" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
-                              title="Password must be at least 8 characters, include uppercase, lowercase, number & special character">
-                        </div>
-                        {% if password_not_match_error %}
-                              <div class="alert alert-danger" role="alert" >
-                                    Your Password not Match !                        
-                              </div>
-                        {% endif %}
-                        <div class="input-group">
-                              <label>Confirm Password</label>
-                              <input type="password" maxlength="8" name = "confirm_password" placeholder="Re-enter password" required>
-                        </div>
+                  
+
+                        <!-- Submit -->
                         <button type="submit" class="signup-btn">Sign Up</button>
+
                         <p class="login-text">Already have an account? <a href="{% url 'login' %}">Login</a></p>
                   </form>
             </div>

@@ -744,7 +744,7 @@ ul li {
 
 /* icon inside the circle */
 .footer-right a i,
-.footer-right a img {
+.footer-right svgimage {
   display: block;          /* remove inline baseline quirks */
   width: 40px;
   height: 40px;

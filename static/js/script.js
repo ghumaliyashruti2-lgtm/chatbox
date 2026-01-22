@@ -1,4 +1,23 @@
 // ======================
+// PASSWORD SHOW 
+// ======================
+function togglePassword(inputId, icon) {
+  const input = document.getElementById(inputId);
+  const iconElement = icon.querySelector("i");
+
+  if (input.type === "password") {
+    input.type = "text";
+    iconElement.classList.remove("fa-eye");
+    iconElement.classList.add("fa-eye-slash");
+  } else {
+    input.type = "password";
+    iconElement.classList.remove("fa-eye-slash");
+    iconElement.classList.add("fa-eye");
+  }
+}
+
+
+// ======================
 // CSRF TOKEN
 // ======================
 function getCookie(name) {

@@ -6,49 +6,45 @@
                   <img src ="/static/images/Elixire_logo.png" >
                   <h2>Login</h2>
                   <form method = "POST" action = "{% url 'login' %}" autocomplete="off">
-                        {% if empt_error %}
-                              <div class="alert alert-danger" role="alert" >
-                                    Please enter value                                
-                              </div>
-                        {% endif %}
-                        
-                        {% if user_not_found %}
-                              <div class="alert alert-danger" role="alert" >
-                                    User not Found, please create account                             
-                              </div>
-                        {% endif %}
-
-                        {% if already_login %}
-                              <div class="alert alert-success" role="alert" >
-                                    You are Already Login!                             
-                              </div>
-                        {% endif %}
-
                         {% csrf_token %}
 
-                        {% if email_invalid %}
-                              <div class="alert alert-danger" role="alert" >
-                                    Please enter valid email                               
+                        {% if form.non_field_errors %}
+                              <div class="alert alert-danger" role="alert">
+                                    {% for error in form.non_field_errors %}
+                                          {{ error }}
+                                    {% endfor %}
                               </div>
                         {% endif %}
+
                         <div class="input-group">
-                              <label>Email</label>
-                              <input type="text" name="email" placeholder="Enter your email" required autocomplete="off"  >
+                        <label>Email</label>
+                        <input type="text" name="email" placeholder="Enter your email" required autocomplete="off" >
                         </div>
-                        {% if password_invalid %}
-                              <div class="alert alert-danger" role="alert" >
-                                    Please enter valid password                               
+
+                        <div class="input-group">
+                              <label for="id_password">Password</label>
+
+                              <div class="password-wrapper">
+                                    <input
+                                          type="password"
+                                          name="password"
+                                          id="id_password"
+                                          placeholder="Create password"
+                                          required
+                                          maxlength="8">
+
+                                    <span class="toggle-password" onclick="togglePassword('id_password', this)">
+                                          <i class='fas fa-eye' style="font-size:14px color:#7d8a99"></i> 
+                                    </span>
                               </div>
-                        {% endif %}
-                        <div class="input-group">
-                              <label>Password</label>
-                              <input type="password" name="password" maxlength="8" placeholder="Enter your password" required autocomplete="off"  >
                         </div>
+                        <a href="{% url 'forgot_password' %}" class="forgot-password">
+                        Forgot password?
+                        </a>
+
 
                         <button type="submit" class="login-btn">Login</button>
 
                         <p class="signup-text">Don't have an account? <a href="{% url 'signup' %}">Sign Up</a></p>
                   </form>
-            </div>
-      
   {% endblock %}    
