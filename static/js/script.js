@@ -116,6 +116,68 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// ======================
+// STREAMING TOGGLE PERSIST
+// ======================
+document.addEventListener("DOMContentLoaded", () => {
+    const streamToggle = document.getElementById("streamToggle");
+    if (!streamToggle) return;
+
+    // Load saved state
+    const saved = localStorage.getItem("streamingEnabled");
+    if (saved !== null) {
+        streamToggle.checked = saved === "true";
+    }
+
+    // Save on change
+    streamToggle.addEventListener("change", () => {
+        localStorage.setItem("streamingEnabled", streamToggle.checked);
+    });
+});
+
+
+// ======================
+// COPY EDIT BUTTON
+// ======================
+document.addEventListener("click", function (e) {
+
+    /* COPY */
+    if (e.target.classList.contains("copy-btn")) {
+        const msg = e.target.closest(".chat-message");
+        const text = msg.querySelector(".message-text")?.innerText || "";
+        navigator.clipboard.writeText(text);
+
+        e.target.innerText = "✅";
+        setTimeout(() => e.target.innerText = '<i class="fa fa-copy"></i>', 800);
+    }
+
+    /* EDIT */
+    if (e.target.classList.contains("edit-btn")) {
+        const msg = e.target.closest(".chat-message");
+        if (!msg.classList.contains("user")) return;
+
+        const textDiv = msg.querySelector(".message-text");
+        const textarea = document.createElement("textarea");
+
+        textarea.value = textDiv.innerText;
+        textarea.className = "edit-box";
+
+        textDiv.replaceWith(textarea);
+        textarea.focus();
+
+        textarea.addEventListener("keydown", e => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                const div = document.createElement("div");
+                div.className = "message-content message-text";
+                div.innerText = textarea.value;
+                textarea.replaceWith(div);
+            }
+        });
+    }
+});
+
+
 
 // ======================
 // SEND MESSAGE
@@ -136,6 +198,7 @@ async function sendMessage(e) {
     const typing = document.getElementById("typingIndicator");
     const modelSelect = document.getElementById("modelSelect");
     const isStreaming = document.getElementById("streamToggle").checked;
+    
 
     const message = input.value.trim();
     if (!message && !selectedFile) return;
@@ -147,19 +210,30 @@ async function sendMessage(e) {
     }
 
     // ✅ USER MESSAGE
-    chatBody.insertAdjacentHTML("beforeend", `
-        <div class="chat-message user-message">
-            ${selectedFile && selectedFile.type.startsWith("image/")
-                ? `<img src="${URL.createObjectURL(selectedFile)}" class="chat-image" />`
-                : `<span class="chat-text">${message}</span>`}
-            <div class="message user">
-                <div class="message-content">
-                    ${message || "📎 " + selectedFile.name}
+    if (selectedFile && selectedFile.type.startsWith("image/")) {
+        chatBody.insertAdjacentHTML("beforeend", `
+            <div class="chat-message user-message">
+                <img src="${URL.createObjectURL(selectedFile)}" class="chat-image" />
+            </div>
+        `);
+    }
+    if (message && message.trim() !== "") {
+        chatBody.insertAdjacentHTML("beforeend", `
+            <div class="chat-message user-message">
+                <div class="message user">
+                    <div class="message-content message-text">
+                        ${message}
+                    </div>
+
+                    <div class="message-actions">
+                        <span class="edit-btn"><i class="fa fa-edit"></i></span>
+                        <span class="copy-btn"><i class="fa fa-copy"></i></span>
+                    </div>
                 </div>
             </div>
-        </div>
-    `);
-    autoScroll();
+        `);
+    }
+
 
     // 🔵 Typing indicator
     if (typing) {
@@ -173,14 +247,18 @@ async function sendMessage(e) {
 
     const formData = new FormData();
     formData.append("message", message);
-    formData.append("chat_id", window.CHAT_ID);
+    formData.append("chat_id", String(window.CHAT_ID));
     formData.append("model", modelSelect.value);
 
-    if (selectedFile && selectedFile.type.startsWith("image/")) {
+    if (selectedFile) {
+    formData.append("file", selectedFile);
+
+    if (selectedFile.type.startsWith("image/")) {
         const base64Image = await fileToBase64(selectedFile);
-        formData.append("image_base64", base64Image);
-        formData.append("file", selectedFile);
+        
     }
+}
+
 
     try {
         let res;
@@ -190,12 +268,13 @@ async function sendMessage(e) {
             res = await fetch("/chatbot/stream/", {
                 method: "POST",
                 headers: {
-                    "X-CSRFToken": getCookie("csrftoken")
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "X-Requested-With": "XMLHttpRequest"  
                 },
                 body: formData
             });
         } else {
-            res = await fetch("", {
+            res = await fetch("/chatbot/", {
                 method: "POST",
                 headers: {
                     "X-CSRFToken": getCookie("csrftoken"),
@@ -217,12 +296,16 @@ async function sendMessage(e) {
             const botWrapper = document.createElement("div");
             botWrapper.className = "chat-message bot-message";
             botWrapper.innerHTML = `
-                <div class="message bot">
-                    <div class="message-content markdown-content">
-                        ${DOMPurify.sanitize(marked.parse(data.reply || ""))}
-                    </div>
+            <div class="message bot">
+                <div class="message-content markdown-content message-text">
+                    ${DOMPurify.sanitize(marked.parse(data.reply || ""))}
                 </div>
-            `;
+                <div class="message-actions">
+                    <span class="copy-btn"><i class="fa fa-copy copy-btn"></i></span>
+                </div>
+            </div>
+        `;
+
             chatBody.appendChild(botWrapper);
             autoScroll();
         }
@@ -239,11 +322,18 @@ async function sendMessage(e) {
             botMsg.className = "message bot";
 
             const botContent = document.createElement("div");
-            botContent.className = "message-content markdown-content";
+            botContent.className = "message-content markdown-content message-text";
 
+            const actions = document.createElement("div");
+            actions.className = "message-actions";
+            actions.innerHTML = `<span class="copy-btn"><i class="fa fa-copy"></i></span>`;
+
+            // ✅ correct order
             botMsg.appendChild(botContent);
+            botMsg.appendChild(actions);
             botWrapper.appendChild(botMsg);
             chatBody.appendChild(botWrapper);
+
 
             let fullMarkdown = "";
 
@@ -264,7 +354,9 @@ async function sendMessage(e) {
             }
         }
 
-        window.REMAINING_MESSAGES--;
+        if (!serverError) {
+             window.REMAINING_MESSAGES--;
+         }
 
     } catch (err) {
         console.error("Chat error:", err);
@@ -280,6 +372,7 @@ async function sendMessage(e) {
     streamStarted = false;
     document.getElementById("fileInput").value = "";
 }
+ 
 
 // ======================
 // FILE UPLOAD
@@ -535,4 +628,4 @@ function confirmCleanHistory() {
         })
         .then(() => location.reload());
     }
-}
+} 

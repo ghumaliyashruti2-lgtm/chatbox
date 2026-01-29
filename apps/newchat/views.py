@@ -53,11 +53,13 @@ def new_chatbot(request):
         ).order_by("created_at")
 
         for item in db_history:
-            if item.user_message:
+            if item.user_message or item.uploaded_file:
                 conversation.append({
                     "role": "user",
                     "content": item.user_message,
+                    "image": item.uploaded_file.url if item.uploaded_file else None
                 })
+
             if item.ai_message:
                 conversation.append({
                     "role": "assistant",
@@ -220,8 +222,8 @@ def stream_chatbot(request):
         # =====================
         # FILE / IMAGE HANDLING
         # =====================
-        final_prompt = message or "Describe this image"
-
+        final_prompt = message or "[Image]"
+        
         if uploaded_file:
             if uploaded_file.content_type.startswith("image"):
                 image_base64 = base64.b64encode(
@@ -283,4 +285,4 @@ def stream_chatbot(request):
         return StreamingHttpResponse(
             f"Server error: {str(e)}",
             status=500
-        )
+        ) 
