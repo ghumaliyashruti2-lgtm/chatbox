@@ -16,29 +16,43 @@
             </a>
             <span>Elixir Techne Help Desk</span>
         </div>
-        
-        <!-- streaming mode-->
-        <div class="stream-toggle">
-            <label>
-                <input type="checkbox" id="streamToggle" checked>
-                <span title="ON/OFF Streaming"></span>
-            </label>
-        </div>
-
         <!-- Model Selector -->
-        <select id="modelSelect" class="model-select">
-            <option value="openai/gpt-4o-mini">GPT-4o Mini (Fast)</option>
-            <option value="openai/gpt-4o">GPT-4o (Smart)</option>
-            <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
-        </select>
-
-
+        <div class="chat-header-center">
+            <select id="modelSelect" class="model-select">
+                <option value="openai/gpt-4o-mini">GPT-4o Mini (Fast)</option>
+                <option value="openai/gpt-4o">GPT-4o (Smart)</option>
+                <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+            </select>
+        </div>
 
         <div class="header-profile mobile-only">
             <a href="{% url 'profiles:profile' %}">
                 <img src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}{% static 'images/user_img.png' %}{% endif %}">
             </a>
         </div>
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fa fa-ellipsis-v"></i>
+        </button>
+
+        <div class="mobile-header-menu" id="mobileHeaderMenu">
+            <div class="settings-item stream-toggle-item mobile-menu-item ">
+                    <span>Streaming</span>
+                    <label class="stream-switch">
+                        <input type="checkbox" id="mobileStreamToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+            <div class=" settings-item mobile-menu-item">
+                <span>Model</span>
+                <select  id="modelSelect" class="model-select mobile-model-select">
+                    <option>GPT-4o Mini (Fast)</option>
+                    <option value="openai/gpt-4o">GPT-4o (Smart)</option>
+                    <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                </select>
+            </div>
+        </div>
+
     </div>
 
     <!-- BODY -->
@@ -162,6 +176,23 @@
     window.REMAINING_SECONDS = {{ remaining_seconds|default:0 }};
     window.CHAT_ID = "{{ chat_id }}";
 </script>
+<script>
+function toggleMobileMenu() {
+    document.getElementById('mobileHeaderMenu')
+        .classList.toggle('show');
+}
+document.addEventListener('click', function(e) {
+    const menu = document.getElementById('mobileHeaderMenu');
+    const btn = document.querySelector('.mobile-menu-btn');
+
+    if (!menu || !btn) return;
+
+    if (!menu.contains(e.target) && !btn.contains(e.target)) {
+        menu.classList.remove('show');
+    }
+});
+</script>
+
 
 {% endblock %}
   

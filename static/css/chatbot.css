@@ -87,82 +87,6 @@ body {
     color: #555;
 }
 
-/* stream option */
-
-/* Streaming toggle container */
-.stream-toggle {
-    display: flex;
-    gap: 0px;
-    margin-left: auto;
-    font-family: Arial, sans-serif;
-}
-
-/* Hide default checkbox */
-.stream-toggle input[type="checkbox"] {
-    display: none;
-}
-
-/* Toggle background */
-.stream-toggle label {
-    display: flex;
-    cursor: pointer;
-    user-select: none;
-}
-
-/* Toggle switch */
-.stream-toggle label span {
-    position: relative;
-    padding-left: 55px;
-    font-size: 14px;
-    color: #444;
-}
-
-/* Switch track */
-.stream-toggle label span::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 44px;
-    height: 24px;
-    background: #ccc;
-    border-radius: 50px;
-    transition: background 0.3s ease;
-}
-
-/* Switch knob */
-.stream-toggle label span::after {
-    content: "";
-    position: absolute;
-    left: 3px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 16px;
-    height: 16px;
-    background: #fff;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-/* ON state */
-.stream-toggle input[type="checkbox"]:checked + span::before {
-    background: #555;
-    color: #555;
-}
-
-.stream-toggle input[type="checkbox"]:checked + span::after {
-    left: 23px;
-}
-
-/* OFF text color */
-.stream-toggle input[type="checkbox"]:not(:checked) + span {
-    color: #ccc;
-    
-}
-
-
 /* model select dropdown */
 
 .model-select {
@@ -204,7 +128,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    
 }
+
 
 /* ===============================
    CHAT BODY (SCROLL AREA)
@@ -426,6 +352,14 @@ body {
    RESPONSIVE DESIGN
 ================================ */
 
+/* 3 dots */
+
+/* Hide mobile menu on desktop */
+.mobile-menu-btn,
+.mobile-header-menu {
+    display: none;
+}
+
 /* Tablets */
 @media (max-width: 768px) {
 
@@ -628,5 +562,124 @@ body {
     .message-actions i {
         font-size: 11px;
         padding: 2px;
+    }
+}
+
+
+/* mobile header */
+/* MOBILE HEADER MODE */
+@media (max-width: 768px) {
+
+    /* Header layout */
+    .chat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+    }
+
+    /* Hide model selector */
+    .chat-header-center {
+        display: none !important;
+    }
+
+    /* LEFT: back + title */
+    .chat-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        color: #fff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 70%;
+    }
+
+    /* RIGHT SIDE */
+    .chat-header-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* PROFILE ICON */
+    .header-profile {
+        padding-left: 0 !important;
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+    }
+
+    /* MOBILE MENU BUTTON */
+    .mobile-menu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .mobile-menu-btn i {
+        margin-left: 0;
+    }
+
+    /* MOBILE DROPDOWN */
+    .mobile-header-menu {
+        display: none;
+        position: absolute;
+        top: 60px;
+        right: 10px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        width: 220px;
+        z-index: 9999;
+        padding: 8px;
+    }
+
+    .mobile-header-menu.show {
+        display: block;
+    }
+
+    .mobile-menu-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 6px;
+        color: #000;
+        border-bottom: 1px solid #eee;
+        font-size: 14px;
+    }
+
+    .mobile-menu-item:last-child {
+        border-bottom: none;
+    }
+
+    .mobile-model-select {
+        width: 120px;
+        font-size: 12px;
+    }
+
+    /* STREAM SWITCH */
+    .stream-switch {
+        width: 54px;
+        height: 18px;
+    }
+
+    .stream-switch .slider:before {
+        width: 14px;
+        height: 14px;
+        left: 2px;
+        bottom: 2px;
+    }
+
+    .stream-switch input:checked + .slider:before {
+        transform: translateX(22px);
     }
 }

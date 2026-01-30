@@ -116,23 +116,45 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+
 // ======================
-// STREAMING TOGGLE PERSIST
+// MOBILE MODE STREAMING 
 // ======================
 document.addEventListener("DOMContentLoaded", () => {
-    const streamToggle = document.getElementById("streamToggle");
-    if (!streamToggle) return;
 
-    // Load saved state
-    const saved = localStorage.getItem("streamingEnabled");
-    if (saved !== null) {
-        streamToggle.checked = saved === "true";
+    const desktopToggle = document.getElementById("desktopStreamToggle");
+    const mobileToggle  = document.getElementById("mobileStreamToggle");
+
+    // If none exist
+    if (!desktopToggle && !mobileToggle) return;
+
+    // 🔹 Load saved state
+    const savedState = localStorage.getItem("streamingEnabled") === "true";
+
+    if (desktopToggle) desktopToggle.checked = savedState;
+    if (mobileToggle)  mobileToggle.checked  = savedState;
+
+    // 🔹 Sync function
+    function syncToggles(value) {
+        localStorage.setItem("streamingEnabled", value);
+        if (desktopToggle) desktopToggle.checked = value;
+        if (mobileToggle)  mobileToggle.checked  = value;
     }
 
-    // Save on change
-    streamToggle.addEventListener("change", () => {
-        localStorage.setItem("streamingEnabled", streamToggle.checked);
-    });
+    // Desktop → Mobile
+    if (desktopToggle) {
+        desktopToggle.addEventListener("change", () => {
+            syncToggles(desktopToggle.checked);
+        });
+    }
+
+    // Mobile → Desktop
+    if (mobileToggle) {
+        mobileToggle.addEventListener("change", () => {
+            syncToggles(mobileToggle.checked);
+        });
+    }
+
 });
 
 
@@ -197,8 +219,8 @@ async function sendMessage(e) {
     const chatBody = document.getElementById("chatBody");
     const typing = document.getElementById("typingIndicator");
     const modelSelect = document.getElementById("modelSelect");
-    const isStreaming = document.getElementById("streamToggle").checked;
-    
+    const isStreaming = localStorage.getItem("streamingEnabled") === "true";
+
 
     const message = input.value.trim();
     if (!message && !selectedFile) return;
