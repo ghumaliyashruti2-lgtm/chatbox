@@ -1,3 +1,4 @@
+
 from django.shortcuts import render
 from django.http import JsonResponse, StreamingHttpResponse
 from django.contrib.auth.decorators import login_required
@@ -176,6 +177,7 @@ def new_chatbot(request):
 @csrf_exempt
 @login_required(login_url="login")
 def stream_chatbot(request):
+    
     """
     Streaming chatbot response (Server-Sent like plain text stream)
     """

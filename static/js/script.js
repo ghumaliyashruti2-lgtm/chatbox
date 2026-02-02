@@ -75,10 +75,17 @@ function forceLimitReached(seconds = 0) {
 // ======================
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Start countdown if there is remaining_seconds
     if (window.REMAINING_SECONDS > 0) {
         startCountdown(window.REMAINING_SECONDS);
     }
+
+    // 🔴 BLOCK USER INPUT if limit reached
+    if (window.REMAINING_MESSAGES <= 0) {
+        forceLimitReached(window.REMAINING_SECONDS);
+    }
 });
+
 
 function startCountdown(seconds) {
     const el = document.getElementById("timeLeft");
@@ -157,47 +164,66 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
+let editingMessageElement = null;
 
 // ======================
 // COPY EDIT BUTTON
 // ======================
+
 document.addEventListener("click", function (e) {
 
-    /* COPY */
-    if (e.target.classList.contains("copy-btn")) {
-        const msg = e.target.closest(".chat-message");
-        const text = msg.querySelector(".message-text")?.innerText || "";
-        navigator.clipboard.writeText(text);
+    const copyBtn = e.target.closest(".copy-btn");
+    const editBtn = e.target.closest(".edit-btn");
 
-        e.target.innerText = "✅";
-        setTimeout(() => e.target.innerText = '<i class="fa fa-copy"></i>', 800);
+    /* ================= COPY ================= */
+    if (copyBtn) {
+        const msg = copyBtn.closest(".chat-message");
+        if (!msg) return;
+
+        const textDiv = msg.querySelector(".message-content");
+        if (!textDiv) return;
+
+        navigator.clipboard.writeText(textDiv.innerText.trim());
+
+        copyBtn.innerHTML = "<i class='fas fa-check-square'></i>";
+        setTimeout(() => {
+            copyBtn.innerHTML = '<i class="fa fa-copy"></i>';
+        }, 800);
     }
 
-    /* EDIT */
-    if (e.target.classList.contains("edit-btn")) {
-        const msg = e.target.closest(".chat-message");
-        if (!msg.classList.contains("user")) return;
+    /* ================= EDIT ================= */
+    if (editBtn) {
+        const msg = editBtn.closest(".chat-message");
+        if (!msg || !msg.classList.contains("user-message")) return;
 
-        const textDiv = msg.querySelector(".message-text");
+        const textDiv = msg.querySelector(".message-content");
+        if (!textDiv) return;
+
+        // prevent multiple edits
+        if (msg.querySelector("textarea")) return;
+
+        editingMessageElement = msg;
+
         const textarea = document.createElement("textarea");
-
-        textarea.value = textDiv.innerText;
-        textarea.className = "edit-box";
+        textarea.className = "edit-textarea";
+        textarea.value = textDiv.innerText.trim();
 
         textDiv.replaceWith(textarea);
         textarea.focus();
 
-        textarea.addEventListener("keydown", e => {
-            if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                const div = document.createElement("div");
-                div.className = "message-content message-text";
-                div.innerText = textarea.value;
-                textarea.replaceWith(div);
+        textarea.addEventListener("keydown", function (ev) {
+            if (ev.key === "Enter" && !ev.shiftKey) {
+                ev.preventDefault();
+
+                document.getElementById("userInput").value = textarea.value;
+                document.getElementById("chatForm")
+                    .dispatchEvent(new Event("submit"));
             }
         });
     }
+
 });
+
 
 
 
@@ -207,6 +233,7 @@ document.addEventListener("click", function (e) {
 let isProcessing = false;
 let selectedFile = null;
 let streamStarted = false;
+let serverError = false;  
 
 async function sendMessage(e) {
     if (e) e.preventDefault();
@@ -239,21 +266,48 @@ async function sendMessage(e) {
             </div>
         `);
     }
+    // ✅ USER MESSAGE (NEW vs EDIT)
     if (message && message.trim() !== "") {
-        chatBody.insertAdjacentHTML("beforeend", `
-            <div class="chat-message user-message">
-                <div class="message user">
-                    <div class="message-content message-text">
-                        ${message}
-                    </div>
 
-                    <div class="message-actions">
-                        <span class="edit-btn"><i class="fa fa-edit"></i></span>
-                        <span class="copy-btn"><i class="fa fa-copy"></i></span>
+        if (!editingMessageElement) {
+            chatBody.insertAdjacentHTML("beforeend", `
+                <div class="chat-message user-message">
+                    <div class="message user">
+                        <div class="message-content message-text">
+                            ${message}
+                        </div>
+                        <div class="message-actions">
+                            <span class="edit-btn"><i class="fa fa-edit"></i></span>
+                            <span class="copy-btn"><i class="fa fa-copy"></i></span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `);
+            `);
+        }
+    }
+    autoScroll();
+
+    // 🧹 EDIT MODE CLEANUP
+    if (editingMessageElement) {
+
+        // remove all messages after edited one
+        let next = editingMessageElement.nextElementSibling;
+        while (next) {
+            const temp = next.nextElementSibling;
+            next.remove();
+            next = temp;
+        }
+
+        // restore textarea → div
+        const textarea = editingMessageElement.querySelector("textarea");
+        if (textarea) {
+            const newDiv = document.createElement("div");
+            newDiv.className = "message-content message-text";
+            newDiv.innerText = message;
+            textarea.replaceWith(newDiv);
+        }
+
+        editingMessageElement = null;
     }
 
 
@@ -317,16 +371,12 @@ async function sendMessage(e) {
 
             const botWrapper = document.createElement("div");
             botWrapper.className = "chat-message bot-message";
-            botWrapper.innerHTML = `
+           botWrapper.innerHTML = `
             <div class="message bot">
                 <div class="message-content markdown-content message-text">
                     ${DOMPurify.sanitize(marked.parse(data.reply || ""))}
                 </div>
-                <div class="message-actions">
-                    <span class="copy-btn"><i class="fa fa-copy copy-btn"></i></span>
-                </div>
-            </div>
-        `;
+            </div>`;
 
             chatBody.appendChild(botWrapper);
             autoScroll();
@@ -375,13 +425,14 @@ async function sendMessage(e) {
                 autoScroll();
             }
         }
+        autoScroll();
 
         if (!serverError) {
              window.REMAINING_MESSAGES--;
          }
 
     } catch (err) {
-        console.error("Chat error:", err);
+         serverError = true; 
         if (typing) typing.style.display = "none";
     }
 
@@ -522,6 +573,13 @@ function previewImage(event) {
 
 
 /***************************************************** HISTORY PAGE LOGIC **************************************/
+
+document.addEventListener("DOMContentLoaded", () => {
+    const chatBody = document.getElementById("chatBody");
+    if (chatBody) {
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+});
 
 // ======================
 // SEARCH & HIGHLIGHT

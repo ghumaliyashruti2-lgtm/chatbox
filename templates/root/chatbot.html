@@ -77,9 +77,10 @@
                             {{ msg.content }}
                         </div>
                         <div class="message-actions">
-                            <i class="fa fa-edit edit-btn"></i>
-                            <i class="fa fa-copy copy-btn"></i>
+                            <span class="edit-btn"><i class="fa fa-edit"></i></span>
+                            <span class="copy-btn"><i class="fa fa-copy"></i></span>
                         </div>
+
                     </div>
                 </div>
             {% else %}
@@ -89,7 +90,7 @@
                             data-markdown="{{ msg.content|escape }}">
                         </div>
                         <div class="message-actions">
-                            <i class="fa fa-copy copy-btn"></i>
+                            <span class="copy-btn"><i class="fa fa-copy"></i></span>
                         </div>
                     </div>
                 </div>
@@ -196,3 +197,13 @@ document.addEventListener('click', function(e) {
 
 {% endblock %}
   
+
+
+
+
+
+
+
+
+
+
