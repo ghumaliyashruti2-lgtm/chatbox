@@ -367,20 +367,33 @@ async function sendMessage(e) {
         // 🧊 NON-STREAMING
         if (!isStreaming) {
             const data = await res.json();
+
             if (typing) typing.style.display = "none";
 
+            // Create bot wrapper
             const botWrapper = document.createElement("div");
             botWrapper.className = "chat-message bot-message";
-           botWrapper.innerHTML = `
-            <div class="message bot">
-                <div class="message-content markdown-content message-text">
-                    ${DOMPurify.sanitize(marked.parse(data.reply || ""))}
-                </div>
-            </div>`;
 
+            const botMsg = document.createElement("div");
+            botMsg.className = "message bot";
+
+            const botContent = document.createElement("div");
+            botContent.className = "message-content markdown-content message-text";
+            botContent.innerHTML = DOMPurify.sanitize(marked.parse(data.reply || ""));
+
+            const actions = document.createElement("div");
+            actions.className = "message-actions";
+            actions.innerHTML = `<span class="copy-btn"><i class="fa fa-copy"></i></span>`;
+
+            // Append in correct order
+            botMsg.appendChild(botContent);
+            botMsg.appendChild(actions);
+            botWrapper.appendChild(botMsg);
             chatBody.appendChild(botWrapper);
+
             autoScroll();
         }
+
 
         // 🔥 STREAMING
         if (isStreaming) {
