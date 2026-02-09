@@ -13,7 +13,7 @@
     <body>
         <div class="profile-card desktop-only" >
                 <div class="profile-img">
-                    <img src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}{% static '/default/user_img.png' %}{% endif %}">
+                    <img src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}{% static 'default/user_img.png' %}{% endif %}">
                 </div>
 
                 <div class="info-row">
@@ -31,19 +31,28 @@
 
                 <hr>
 
-                <!-- Streaming Toggle -->
-                <div class="settings-item stream-toggle-item">
-                    <i class="fa-solid fa-bolt"></i>
-                    <span>Streaming</span>
-
-                    <label class="stream-switch">
-                        <input type="checkbox" id="desktopStreamToggle" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                
                 <div class="settings-scroll">
 
+                    <!-- Streaming Toggle -->
+                    <div class="settings-item stream-toggle-item">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>Streaming</span>
+
+                        <label class="stream-switch">
+                            <input type="checkbox" id="desktopStreamToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item theme-toggle">
+                        <i class='fas fa-moon'></i>
+                        <span>Dark Mode</span>
+                        <label class="switch">
+                            <input type="checkbox" id="themeToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                
                     <a href="{% url 'chatbot' %}?action=new" class="settings-link">
                         <div class="settings-item">
                             <i class="fas fa-comment-dots"></i>

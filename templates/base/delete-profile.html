@@ -3,8 +3,7 @@
   {% load static %}
    <link rel="stylesheet" href="{% static 'css/edit_delete.css' %}">
     <div class="card">
-        <div class="close-btn"><a href= "{% url 'profiles:my-profile' %}" style="text-decoration:none; color:white;">✕</a></div>
-
+        
         <div class="icon-container">
             <img id="previewImg" class="profile-img"
         src="{% if profile.profile_picture %}

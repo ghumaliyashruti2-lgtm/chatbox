@@ -98,7 +98,7 @@
         {% endfor %}
 
         {% if limit_reached %}
-            <div class="system-message" id="limitMessage">
+            <div class="chat-message system-message" id="limitMessage">
                 ⏳ Chat limit reached.
                 <span id="timeLeft"></span>
             </div>
@@ -130,7 +130,6 @@
                 type="text"
                 id="userInput"
                 autocomplete="off"
-                class="chat-input-box"
                 autofocus
                 {% if limit_reached %}disabled{% endif %}
             >
@@ -158,7 +157,8 @@
 
             <!-- Send -->
             <button type="submit" id="sendBtn" class="send-btn" 
-                {% if limit_reached %}disabled style="opacity:.5;cursor:not-allowed"{% endif %}>
+    {% if limit_reached %}disabled style="opacity:.5;cursor:not-allowed"{% endif %}
+>
                 <i class="fas fa-paper-plane"></i>
             </button>
         </form>
@@ -197,12 +197,3 @@ document.addEventListener('click', function(e) {
 
 {% endblock %}
   
-
-
-
-
-
-
-
-
-

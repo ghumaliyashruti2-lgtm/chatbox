@@ -1,0 +1,745 @@
+
+/* =====================================
+   🌙 CHATGPT PROFESSIONAL DARK MODE
+===================================== */
+
+/* BODY */
+body {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+/* CHAT BODY */
+.chat-body {
+    background: #282828 !important;
+}
+
+/* CHAT HEADER */
+.chat-header {
+    background: #1A1A1A !important;
+    color: #ffffff !important;
+}
+
+/* CHAT FOOTER */
+.chat-footer {
+    background: #282828 !important;
+    border-top: 1px solid #303030 !important;
+}
+
+/* INPUT BOX */
+.chat-input-box {
+    background: #303030 !important;
+}
+
+.chat-input-box input {
+    color: #ffffff !important;
+}
+
+/* ICONS */
+.icon-btn {
+    color: #ffffff !important;
+}
+
+.icon-btn:hover {
+    color: #ffffff !important;
+}
+
+/* SEND BUTTON */
+.send-btn {
+    background: #303030 !important;
+    color: #ffffff !important;
+}
+
+.send-btn:hover {
+    background: #3a3a3a !important;
+}
+
+/* USER MESSAGE */
+.user-message .message,
+.message.user {
+    background: #303030 !important;
+    color: #ffffff !important;
+}
+
+/* BOT MESSAGE */
+.bot-message .message,
+.message.bot {
+    background: #303030 !important;
+    color: #ffffff !important;
+}
+
+/* SYSTEM MESSAGE */
+.system-message {
+    background: #303030 !important;
+    color: #ffffff !important;
+}
+
+/* TYPING INDICATOR */
+#typingIndicator {
+    background: #303030 !important;
+}
+
+/* MARKDOWN DARK */
+.markdown-content pre {
+    background: #111111 !important;
+}
+
+.markdown-content code {
+    background: #1c1c1c !important;
+}
+
+.markdown-content blockquote {
+    border-left: 4px solid #666 !important;
+    color: #ddd !important;
+}
+
+/* TABLE DARK */
+.markdown-content th,
+.markdown-content td {
+    border: 1px solid #444 !important;
+    color: #ffffff !important;
+}
+
+/* DROPDOWN MODEL */
+.model-select {
+    background: #303030 !important;
+    color: #ffffff !important;
+}
+
+/* MESSAGE ICON COLORS */
+.user-message i,
+.bot-message i {
+    color: #ffffff !important;
+}
+
+
+/* =====================================
+   🌙 PROFILE PAGE DARK MODE
+===================================== */
+
+/* BODY */
+body {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+/* MAIN CONTAINER */
+.profile-container {
+    background: #1A1A1A !important;
+    box-shadow: none !important;
+}
+
+/* HEADER BG */
+.profile-header-bg {
+    background: #282828 !important;
+}
+
+/* TEXT COLORS */
+.profile-user h3,
+label {
+    color: #ffffff !important;
+}
+
+.profile-user p {
+    color: #bbbbbb !important;
+}
+
+/* BACK BUTTON */
+.back-btn {
+    background: #303030 !important;
+    color: #ffffff !important;
+}
+
+/* ACTION BUTTONS */
+.circle-btn {
+    background: #303030 !important;
+    color: #ffffff !important;
+}
+
+.circle-btn:hover {
+    background: #3a3a3a !important;
+}
+
+/* INPUT FIELDS */
+input,
+select {
+    background: #282828 !important;
+    border: 1px solid #303030 !important;
+    color: #ffffff !important;
+}
+
+input:focus,
+select:focus {
+    background: #282828 !important;
+    border-color: #444 !important;
+}
+
+/* SAVE BUTTON */
+.save-btn {
+    background: #303030 !important;
+    color: #ffffff !important;
+}
+
+.save-btn:hover {
+    background: #3a3a3a !important;
+}
+
+/* POPUP OVERLAY */
+.popup-overlay {
+    background: rgba(0, 0, 0, 0.75) !important;
+}
+
+/* IFRAME DARK SAFE */
+.popup-wrapper iframe {
+    background: #1A1A1A !important;
+}
+
+
+/* =====================================
+   🌙 HISTORY PAGE DARK MODE
+===================================== */
+
+/* BODY */
+body {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+/* MAIN CARD */
+.main {
+    background: #1A1A1A !important;
+    box-shadow: none !important;
+}
+
+/* DATE TITLE */
+.date-title,
+.timeline-date {
+    color: #ffffff !important;
+}
+
+/* NO HISTORY TEXT */
+.no-history {
+    color: #aaaaaa !important;
+}
+
+/* SEARCH INPUT */
+.search-box input {
+    background: #282828 !important;
+    border: 1px solid #303030 !important;
+    color: #ffffff !important;
+}
+
+/* DROPDOWN */
+.dropdown {
+    background: #282828 !important;
+    border: 1px solid #303030 !important;
+    color: #ffffff !important;
+}
+
+/* BACK BUTTON */
+.back-btn {
+    background: #303030 !important;
+    color: #ffffff !important;
+}
+
+.back-btn:hover {
+    background: #3a3a3a !important;
+}
+
+/* DOT MENU */
+.dots:hover {
+    background: #303030 !important;
+}
+
+.dots-menu {
+    background: #1A1A1A !important;
+    border: 1px solid #303030 !important;
+}
+
+.menu-item:hover,
+.submenu-item:hover {
+    background: #282828 !important;
+}
+
+/* HISTORY CONTENT BOX */
+.content {
+    background: #1A1A1A !important;
+    box-shadow: none !important;
+}
+
+/* MESSAGE TEXT */
+.history-msg {
+    background: #303030 !important;
+    color: #ffffff !important;
+}
+
+.history-link:hover .history-msg {
+    background: #3a3a3a !important;
+    color: #ffffff !important;
+}
+
+/* TIME TEXT */
+.time {
+    color: #bbbbbb !important;
+}
+
+/* DELETE BUTTON */
+.delete-btn {
+    color: #ffffff !important;
+}
+
+.delete-btn:hover {
+    color: #ff6b6b !important;
+}
+
+/* POPUP */
+.clean-popup-box,
+.simple-popup-box {
+    background: #1A1A1A !important;
+    color: #ffffff !important;
+}
+
+/* POPUP BUTTONS */
+.simple-cancel,
+.simple-delete {
+    background: #303030 !important;
+    color: #ffffff !important;
+}
+
+.simple-cancel:hover,
+.simple-delete:hover {
+    background: #3a3a3a !important;
+}
+
+/* TIMELINE CARD */
+.timeline-card {
+    background: #282828 !important;
+    box-shadow: none !important;
+}
+
+.timeline-time {
+    color: #bbbbbb !important;
+}
+
+.timeline-text {
+    color: #ffffff !important;
+}
+
+/* =====================================
+   🌙 CHATGPT PROFESSIONAL DARK THEME
+===================================== */
+
+/* BODY */
+body{
+    background:#000000 !important;
+    color:#ffffff !important;
+}
+
+/* MAIN CHAT CARD */
+.chat-card{
+    background:#282828 !important;
+    box-shadow:none !important;
+}
+
+/* SIDEBAR */
+.chat-sidebar{
+    background:#1A1A1A !important;
+    border-right:1px solid #303030 !important;
+}
+
+/* PROFILE CARD */
+.profile-card{
+    background:#1A1A1A !important;
+    box-shadow:none !important;
+}
+
+/* TEXT COLORS */
+.settings-item span,
+.info-row span,
+.info-row strong,
+.info-row-email{
+    color:#ffffff !important;
+}
+
+/* DIVIDERS */
+hr{
+    border-top:1px solid #303030 !important;
+}
+
+/* SETTINGS ITEMS */
+.settings-item{
+    border-bottom:1px solid #303030 !important;
+}
+
+/* CHAT MAIN */
+.chat-inner-card{
+    background:#282828 !important;
+    box-shadow:none !important;
+}
+
+/* CHAT HEADER */
+.chat-header{
+    background:#1A1A1A !important;
+    color:#ffffff !important;
+}
+
+/* INPUT AREAS */
+input,
+textarea,
+select{
+    background:#282828 !important;
+    border:1px solid #303030 !important;
+    color:#ffffff !important;
+}
+
+/* MESSAGE BUBBLES */
+.chat-message,
+.bot-message,
+.user-message{
+    background:#282828 !important;
+    color:#ffffff !important;
+}
+
+/* BUTTONS */
+button{
+    background:#303030 !important;
+    color:#ffffff !important;
+}
+
+button:hover{
+    background:#3a3a3a !important;
+}
+
+/* LINKS */
+a{
+    color:#ffffff !important;
+}
+
+/* MOBILE BODY */
+@media (max-width:768px){
+    body{
+        background:#000000 !important;
+    }
+
+    .profile-card{
+        background:#1A1A1A !important;
+    }
+}
+
+
+/* =====================================
+   🌙 CHATGPT DARK PROFILE THEME
+===================================== */
+
+/* BODY */
+body{
+    background:#000000 !important;
+    color:#ffffff !important;
+}
+
+/* CARD */
+.card{
+    background:#303030 !important;
+    box-shadow:none !important;
+    color:#ffffff !important;
+}
+
+/* ICON CONTAINER */
+.icon-container{
+    background:#282828 !important;
+}
+
+/* TEXT */
+h2{
+    color:#ffffff !important;
+}
+
+/* BUTTONS */
+.delete-btn,
+.edit-btn label,
+.save-btn{
+    background:#303030 !important;
+    color:#ffffff !important;
+}
+
+.delete-btn:hover,
+.edit-btn label:hover,
+.save-btn:hover{
+    background:#3a3a3a !important;
+}
+
+/* LINKS */
+.save-btn a{
+    color:#ffffff !important;
+}
+
+/* TRANSPARENT CONTAINERS KEEP DARK CONTEXT */
+.profile-card,
+.profile-container,
+.container{
+    background:transparent !important;
+}
+
+/* MOBILE SAFETY */
+@media(max-width:768px){
+    body{
+        background:#000000 !important;
+    }
+}
+
+
+/* =====================================
+   🌙 CHATGPT DARK FORGOT PASSWORD THEME
+===================================== */
+
+/* BODY */
+body{
+    background:#000000 !important;
+    color:#ffffff !important;
+}
+
+/* CONTAINER */
+.forgot-password-container{
+    background:#282828 !important;
+    box-shadow:none !important;
+    color:#ffffff !important;
+}
+
+/* TITLE */
+.forgot-password-container h2{
+    color:#ffffff !important;
+}
+
+/* LABELS */
+.input-group label{
+    color:#ffffff !important;
+}
+
+/* INPUTS */
+.input-group input{
+    background:#303030 !important;
+    border:1px solid #303030 !important;
+    color:#ffffff !important;
+}
+
+.input-group input:focus{
+    border-color:#3a3a3a !important;
+}
+
+/* PASSWORD TOGGLE */
+.toggle-password{
+    color:#ffffff !important;
+}
+
+/* BUTTON */
+.save-btn{
+    background:#303030 !important;
+    color:#ffffff !important;
+}
+
+.save-btn:hover{
+    background:#3a3a3a !important;
+    transform:scale(1.05);
+}
+
+/* ALERTS DARK MODE */
+.alert-danger{
+    background:#3a1f22 !important;
+    color:#ffb3b8 !important;
+    border-color:#5c2a30 !important;
+}
+
+.alert-success{
+    background:#1f3a2a !important;
+    color:#a6f3c3 !important;
+    border-color:#2d5c45 !important;
+}
+
+/* MOBILE SAFETY */
+@media(max-width:480px){
+    body{
+        background:#000000 !important;
+    }
+}
+
+/* =====================================
+   🌙 CHATGPT DARK LOGIN THEME
+===================================== */
+
+/* BODY */
+body{
+    background:#000000 !important;
+    color:#ffffff !important;
+}
+
+/* LOGIN CONTAINER */
+.login-container{
+    background:#282828 !important;
+    color:#ffffff !important;
+    box-shadow:none !important;
+}
+
+/* TITLE */
+.login-container h2{
+    color:#ffffff !important;
+}
+
+/* LABELS */
+.input-group label{
+    color:#ffffff !important;
+}
+
+/* INPUTS */
+.input-group input{
+    background:#303030 !important;
+    border:1px solid #303030 !important;
+    color:#ffffff !important;
+}
+
+.input-group input:focus{
+    border-color:#3a3a3a !important;
+}
+
+/* PASSWORD ICON */
+.toggle-password{
+    color:#ffffff !important;
+}
+
+/* LOGIN BUTTON */
+.login-btn{
+    background:#303030 !important;
+    color:#ffffff !important;
+}
+
+.login-btn:hover{
+    background:#3a3a3a !important;
+}
+
+/* SIGNUP TEXT */
+.signup-text{
+    color:#ffffff !important;
+}
+
+.signup-text a{
+    color:#ffffff !important;
+}
+
+.signup-text a:hover{
+    color:#cccccc !important;
+}
+
+/* LOGOUT BUTTON */
+.logout span a{
+    background:#303030 !important;
+    color:#ffffff !important;
+}
+
+.logout span a:hover{
+    background:#3a3a3a !important;
+}
+
+/* ALERTS DARK MODE */
+.alert-danger{
+    background:#3a1f22 !important;
+    color:#ffb3b8 !important;
+    border-color:#5c2a30 !important;
+}
+
+.alert-success{
+    background:#1f3a2a !important;
+    color:#a6f3c3 !important;
+    border-color:#2d5c45 !important;
+}
+
+/* MOBILE SAFETY */
+@media(max-width:480px){
+    body{
+        background:#000000 !important;
+    }
+}
+
+/* =====================================
+   🌙 CHATGPT DARK SIGNUP THEME
+===================================== */
+
+/* BODY */
+body{
+    background:#000000 !important;
+    color:#ffffff !important;
+}
+
+/* CONTAINER */
+.signup-container{
+    background:#282828 !important;
+    color:#ffffff !important;
+    box-shadow:none !important;
+}
+
+/* TITLE */
+.signup-container h2{
+    color:#ffffff !important;
+}
+
+/* LABELS */
+.input-group label{
+    color:#ffffff !important;
+}
+
+/* INPUTS */
+.input-group input{
+    background:#303030 !important;
+    border:1px solid #303030 !important;
+    color:#ffffff !important;
+}
+
+.input-group input:focus{
+    border-color:#3a3a3a !important;
+}
+
+/* PASSWORD ICON */
+.toggle-password{
+    color:#ffffff !important;
+}
+
+/* SIGNUP BUTTON */
+.signup-btn{
+    background:#303030 !important;
+    color:#ffffff !important;
+}
+
+.signup-btn:hover{
+    background:#3a3a3a !important;
+}
+
+/* LOGIN TEXT */
+.login-text{
+    color:#ffffff !important;
+}
+
+.login-text a{
+    color:#ffffff !important;
+}
+
+.login-text a:hover{
+    color:#cccccc !important;
+}
+
+/* ALERTS DARK MODE */
+.alert-danger{
+    background:#3a1f22 !important;
+    color:#ffb3b8 !important;
+    border-color:#5c2a30 !important;
+}
+
+.alert-success{
+    background:#1f3a2a !important;
+    color:#a6f3c3 !important;
+    border-color:#2d5c45 !important;
+}
+
+/* MOBILE SAFETY */
+@media(max-width:480px){
+    body{
+        background:#000000 !important;
+    }
+}  
