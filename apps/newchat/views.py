@@ -11,6 +11,8 @@ from apps.newchat.forms import ChatbotMessageForm
 from apps.history.models import History
 from apps.profiles.models import Profile
 from chatbox.openrouter_api import OpenRouterChatbot
+from .guardrails import check_guardrails
+
 
 
 # =====================
@@ -104,6 +106,11 @@ def new_chatbot(request):
         try:
             # ✅ ALWAYS DEFINE FIRST
             message = request.POST.get("message", "").strip()
+            # 🚫 Guardrails check
+            if message and not check_guardrails(message):
+                return JsonResponse({"blocked": True}, status=403)
+
+
             uploaded_file = request.FILES.get("file")
             image_base64 = request.POST.get("image_base64")
 
@@ -190,6 +197,11 @@ def stream_chatbot(request):
         # SAFE INPUT HANDLING
         # =====================
         message = request.POST.get("message", "").strip()
+        # 🚫 Guardrails check
+        if message and not check_guardrails(message):
+            return JsonResponse({"blocked": True}, status=403)
+
+
         chat_id = request.POST.get("chat_id")
         image_base64 = request.POST.get("image_base64")
         uploaded_file = request.FILES.get("file")

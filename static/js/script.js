@@ -277,73 +277,12 @@ async function sendMessage(e) {
     const modelSelect = document.getElementById("modelSelect");
     const isStreaming = localStorage.getItem("streamingEnabled") === "true";
 
-
     const message = input.value.trim();
     if (!message && !selectedFile) return;
 
-    // 🚫 HARD LIMIT CHECK
     if (window.REMAINING_MESSAGES <= 0) {
         forceLimitReached(window.REMAINING_SECONDS);
         return;
-    }
-
-    // ✅ USER MESSAGE
-    if (selectedFile && selectedFile.type.startsWith("image/")) {
-        chatBody.insertAdjacentHTML("beforeend", `
-            <div class="chat-message user-message">
-                <img src="${URL.createObjectURL(selectedFile)}" class="chat-image" />
-            </div>
-        `);
-    }
-    // ✅ USER MESSAGE (NEW vs EDIT)
-    if (message && message.trim() !== "") {
-
-        if (!editingMessageElement) {
-            chatBody.insertAdjacentHTML("beforeend", `
-                <div class="chat-message user-message">
-                    <div class="message user">
-                        <div class="message-content message-text">
-                            ${message}
-                        </div>
-                        <div class="message-actions">
-                            <span class="edit-btn"><i class="fa fa-edit"></i></span>
-                            <span class="copy-btn"><i class="fa fa-copy"></i></span>
-                        </div>
-                    </div>
-                </div>
-            `);
-        }
-    }
-    autoScroll();
-
-    // 🧹 EDIT MODE CLEANUP
-    if (editingMessageElement) {
-
-        // remove all messages after edited one
-        let next = editingMessageElement.nextElementSibling;
-        while (next) {
-            const temp = next.nextElementSibling;
-            next.remove();
-            next = temp;
-        }
-
-        // restore textarea → div
-        const textarea = editingMessageElement.querySelector("textarea");
-        if (textarea) {
-            const newDiv = document.createElement("div");
-            newDiv.className = "message-content message-text";
-            newDiv.innerText = message;
-            textarea.replaceWith(newDiv);
-        }
-
-        editingMessageElement = null;
-    }
-
-
-    // 🔵 Typing indicator
-    if (typing) {
-        typing.style.display = "flex";
-        chatBody.appendChild(typing);
     }
 
     isProcessing = true;
@@ -355,51 +294,55 @@ async function sendMessage(e) {
     formData.append("chat_id", String(window.CHAT_ID));
     formData.append("model", modelSelect.value);
 
-    if (selectedFile) {
-    formData.append("file", selectedFile);
-
-    if (selectedFile.type.startsWith("image/")) {
-        const base64Image = await fileToBase64(selectedFile);
-        
-    }
-}
-
+    if (selectedFile) formData.append("file", selectedFile);
 
     try {
-        let res;
 
-        // 🔀 MODE SWITCH
-        if (isStreaming) {
-            res = await fetch("/chatbot/stream/", {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": getCookie("csrftoken"),
-                    "X-Requested-With": "XMLHttpRequest"  
-                },
-                body: formData
-            });
-        } else {
-            res = await fetch("/chatbot/", {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": getCookie("csrftoken"),
-                    "X-Requested-With": "XMLHttpRequest"
-                },
-                body: formData
-            });
+        // ✅ 1. SEND REQUEST FIRST (check legal)
+        const res = await fetch(isStreaming ? "/chatbot/stream/" : "/chatbot/", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken"),
+                "X-Requested-With": "XMLHttpRequest"
+            },
+            body: formData
+        });
+
+        // 🚫 2. ILLEGAL → popup only
+        if (res.status === 403) {
+            alert("Don't share illegal content or personal info");
+
+            isProcessing = false;
+            input.disabled = false;
+            sendBtn.style.opacity = "1";
+            return;
         }
 
-        if (!res.ok) {
-            throw new Error("Server error " + res.status);
+        // ✅ 3. SHOW USER MESSAGE
+        chatBody.insertAdjacentHTML("beforeend", `
+            <div class="chat-message user-message">
+                <div class="message user">
+                    <div class="message-content message-text">${message}</div>
+                </div>
+            </div>
+        `);
+
+        // ✅ 4. SHOW TYPING
+        if (typing) {
+            typing.style.display = "flex";
+            chatBody.appendChild(typing);
         }
 
-        // 🧊 NON-STREAMING
+        autoScroll();
+
+        // ======================
+        // NON STREAM
+        // ======================
         if (!isStreaming) {
             const data = await res.json();
 
             if (typing) typing.style.display = "none";
 
-            // Create bot wrapper
             const botWrapper = document.createElement("div");
             botWrapper.className = "chat-message bot-message";
 
@@ -410,21 +353,16 @@ async function sendMessage(e) {
             botContent.className = "message-content markdown-content message-text";
             botContent.innerHTML = DOMPurify.sanitize(marked.parse(data.reply || ""));
 
-            const actions = document.createElement("div");
-            actions.className = "message-actions";
-            actions.innerHTML = `<span class="copy-btn"><i class="fa fa-copy"></i></span>`;
-
-            // Append in correct order
             botMsg.appendChild(botContent);
-            botMsg.appendChild(actions);
             botWrapper.appendChild(botMsg);
             chatBody.appendChild(botWrapper);
 
             autoScroll();
         }
 
-
-        // 🔥 STREAMING
+        // ======================
+        // STREAM
+        // ======================
         if (isStreaming) {
             const reader = res.body.getReader();
             const decoder = new TextDecoder();
@@ -438,16 +376,9 @@ async function sendMessage(e) {
             const botContent = document.createElement("div");
             botContent.className = "message-content markdown-content message-text";
 
-            const actions = document.createElement("div");
-            actions.className = "message-actions";
-            actions.innerHTML = `<span class="copy-btn"><i class="fa fa-copy"></i></span>`;
-
-            // ✅ correct order
             botMsg.appendChild(botContent);
-            botMsg.appendChild(actions);
             botWrapper.appendChild(botMsg);
             chatBody.appendChild(botWrapper);
-
 
             let fullMarkdown = "";
 
@@ -467,18 +398,14 @@ async function sendMessage(e) {
                 autoScroll();
             }
         }
-        autoScroll();
 
-        if (!serverError) {
-             window.REMAINING_MESSAGES--;
-         }
+        window.REMAINING_MESSAGES--;
 
     } catch (err) {
-         serverError = true; 
         if (typing) typing.style.display = "none";
     }
 
-    // 🔄 RESET (ALWAYS RUNS)
+    // RESET
     isProcessing = false;
     input.disabled = false;
     sendBtn.style.opacity = "1";
@@ -487,7 +414,6 @@ async function sendMessage(e) {
     streamStarted = false;
     document.getElementById("fileInput").value = "";
 }
- 
 
 // ======================
 // FILE UPLOAD
