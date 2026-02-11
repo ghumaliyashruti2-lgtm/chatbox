@@ -287,8 +287,21 @@ document.addEventListener("click", function (e) {
 
 });
 
+// ======================
+// show guardrail popup 
+// ======================
+function showIllegalPopup() {
+    const popup = document.getElementById("illegalPopup");
+    popup.classList.remove("hidden");
 
+    setTimeout(() => {
+        popup.classList.add("hidden");
+    }, 4000);
+}
 
+function closeIllegalPopup() {
+    document.getElementById("illegalPopup").classList.add("hidden");
+}
 
 // ======================
 // SEND MESSAGE
@@ -344,8 +357,8 @@ async function sendMessage(e) {
 
         // 🚫 2. ILLEGAL → popup only
         if (res.status === 403) {
-            alert("Don't share illegal content or personal info");
-
+            showIllegalPopup();
+            
             isProcessing = false;
             input.disabled = false;
             sendBtn.style.opacity = "1";

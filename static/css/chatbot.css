@@ -107,6 +107,45 @@ body {
     border: none !important;
 }
 
+/* ===============================
+  guardrail popup 
+================================ */
+
+.illegal-popup {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #f7e6b5;
+  color: #7a5b00;
+  padding: 14px 18px;
+  border-radius: 12px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  animation: slideUp 0.25s ease;
+  z-index: 9999;
+}
+
+.illegal-popup button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  color: #7a5b00;
+}
+
+.hidden {
+  display: none;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translate(-50%, 20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
 
 /* ===============================
    CHAT LAYOUT (IMPORTANT FIX)
