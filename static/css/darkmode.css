@@ -113,6 +113,23 @@ body {
 }
 
 
+/* DROPDOWN MODEL */
+
+.menu-btn{
+    background: #303030 !important;
+    color: #ffffff !important;
+}
+
+.menu-btn i{
+    background: #303030 !important;
+    color: #ffffff !important;
+}
+
+.menu-dropdown{
+     background: #303030 !important;
+    color: #ffffff !important;
+}
+
 /* =====================================
    🌙 PROFILE PAGE DARK MODE
 ===================================== */
@@ -743,3 +760,4 @@ body{
         background:#000000 !important;
     }
 }  
+

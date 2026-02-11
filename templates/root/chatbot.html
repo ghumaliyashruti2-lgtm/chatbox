@@ -15,6 +15,23 @@
                 <i class="fa fa-arrow-left"></i>
             </a>
             <span>Elixir Techne Help Desk</span>
+            <!--<div class="header-right">
+
+                <!-- SHARE CHAT 
+                <button id="shareChatBtn" class="header-btn">
+                    <i class="fa-solid fa-link"></i> Share
+                </button>
+
+                 CREATE GROUP 
+                <button id="createGroupBtn" class="header-btn">
+                    <i class="fa-solid fa-users"></i> Create Group
+                </button>
+
+                 JOIN GROUP
+                <button id="joinGroupBtn" class="header-btn">
+                    <i class="fa-solid fa-user-plus"></i> Join
+                </button>
+            </div> -->
         </div>
         <!-- Model Selector -->
         <div class="chat-header-center">
@@ -24,6 +41,7 @@
                 <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
             </select>
         </div>
+    
 
         <div class="header-profile mobile-only">
             <a href="{% url 'profiles:profile' %}">
@@ -163,8 +181,6 @@
             </button>
         </form>
     </div>
-
-
 </div>
 <!-- Markdown Parser -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -176,8 +192,7 @@
     window.REMAINING_MESSAGES = {{ remaining_messages }};
     window.REMAINING_SECONDS = {{ remaining_seconds|default:0 }};
     window.CHAT_ID = "{{ chat_id }}";
-</script>
-<script>
+
 function toggleMobileMenu() {
     document.getElementById('mobileHeaderMenu')
         .classList.toggle('show');

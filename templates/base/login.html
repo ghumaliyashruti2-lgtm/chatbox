@@ -3,7 +3,7 @@
       {% load static %}
              <link rel="stylesheet" href="{% static 'css/login.css' %}">
             <div class="login-container">
-                  <img src ="/static/images/Elixire_logo.png" >
+                  <img class = "logo-img" src ="/static/images/Elixire_logo.png" > 
                   <h2>Login</h2>
                   <form method = "POST" action = "{% url 'login' %}" autocomplete="off">
                         {% csrf_token %}

@@ -8,7 +8,8 @@ class History(models.Model):
     user_message = models.TextField()
     ai_message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    
+    is_archived = models.BooleanField(default=False)
+
     uploaded_file = models.FileField(
         upload_to="chat_uploads/",
         null=True,

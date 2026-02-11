@@ -1,3 +1,6 @@
+// =================
+// DARK THEME 
+// =================
 const darkSheet = document.getElementById("darkThemeStylesheet");
 const themeToggle = document.getElementById("themeToggle");
 
@@ -24,7 +27,38 @@ themeToggle.addEventListener("change", function(){
     }
 
 });
+// ======================
+// 3 DOT MENU (MULTIPLE SAFE)
+// ======================
 
+document.addEventListener("click", function (e) {
+
+    // Close all menus if click outside
+    document.querySelectorAll(".menu-dropdown").forEach(menu => {
+        if (!menu.parentElement.contains(e.target)) {
+            menu.style.display = "none";
+        }
+    });
+
+});
+
+// Toggle individual menu
+document.querySelectorAll(".menu-btn").forEach(btn => {
+    btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+
+        const menu = this.nextElementSibling;
+
+        // Close other open menus first
+        document.querySelectorAll(".menu-dropdown").forEach(m => {
+            if (m !== menu) m.style.display = "none";
+        });
+
+        // Toggle current menu
+        menu.style.display =
+            menu.style.display === "block" ? "none" : "block";
+    });
+});
 
 
 // ======================
@@ -627,6 +661,83 @@ function toggleSubmenu(e) {
 
 
 // ======================
+// ARCHIVE HISTORY LOGIC
+// ======================
+
+
+function archiveChat(chatId){
+
+    fetch(`/archive/${chatId}/`,{
+        method:"POST",
+        headers:{
+            "X-CSRFToken": getCookie("csrftoken")
+        }
+    })
+    .then(res=>res.json())
+    .then(data=>{
+
+        const row = document.querySelector(`[data-chat="${chatId}"]`);
+        if(!row) return;
+
+        const group = row.closest(".history-group");
+
+        row.style.opacity="0";
+        row.style.transform="translateX(40px)";
+
+        setTimeout(()=>{
+
+            row.remove();
+
+            if(group && group.querySelectorAll(".history-row").length === 0){
+                group.remove();
+            }
+
+        },250);
+
+    });
+}
+
+// ======================
+// UNARCHIVE HISTORY LOGIC
+// ======================
+
+
+function unarchiveChat(chatId){
+
+    fetch(`/unarchive/${chatId}/`,{
+        method:"POST",
+        headers:{
+            "X-CSRFToken": getCookie("csrftoken")
+        }
+    })
+    .then(res=>res.json())
+    .then(data=>{
+
+        const row = document.querySelector(`[data-chat="${chatId}"]`);
+        if(!row) return;
+
+        const group = row.closest(".history-group");
+
+        row.style.opacity="0";
+        row.style.transform="translateX(40px)";
+
+        setTimeout(()=>{
+
+            row.remove();
+
+            if(group && group.querySelectorAll(".history-row").length === 0){
+                group.remove();
+            }
+
+        },250);
+
+    });
+    
+
+}
+
+
+// ======================
 // HISTORY PAGE DELETE LOGIC
 // ======================
 
@@ -677,3 +788,5 @@ function confirmCleanHistory() {
         .then(() => location.reload());
     }
 } 
+
+

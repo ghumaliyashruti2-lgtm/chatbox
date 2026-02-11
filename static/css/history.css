@@ -499,3 +499,51 @@ body {
     }
 }
 
+
+
+/* 3 dot option */
+
+.chat-header-center{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.menu-wrapper{
+    position:relative;
+}
+
+.menu-btn{
+    background:transparent;
+    border:none;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.menu-btn i{
+    color: #4BA3DE;
+}
+.menu-dropdown{
+    position:absolute;
+    top:40px;
+    right:0;
+    background:white;
+    border-radius:8px;
+    display:none;
+    min-width:160px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.3);
+    z-index:999;
+    color:#333;
+    font-size:14px;
+}
+
+.menu-item{
+    padding:10px;
+    cursor:pointer;
+}
+
+.menu-item:hover{
+    background:whitesmoke   ;
+}
+

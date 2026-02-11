@@ -3,7 +3,7 @@
       {% load static %}
        <link rel="stylesheet" href="{% static 'css/signup.css' %}">
             <div class="signup-container">
-                  <img src ="/static/images/Elixire_logo.png" >
+                  <img class="logo-img" src ="/static/images/Elixire_logo.png" >
                   <h2>Sign up</h2>
                   <form method="POST" action="{% url 'signup' %}">
                         {% csrf_token %}

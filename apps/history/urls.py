@@ -8,10 +8,12 @@ app_name = "history"
 
 urlpatterns = [
     
-    path("history",views.view_history,name="history"),
+    path("history/",views.view_history,name="history"),
     path("clean-history/", views.clean_history, name="clean-history"),
     path("delete-history/<uuid:chat_id>/", views.delete_history, name="delete_single_history"),
-    
+    path("archive/<uuid:chat_id>/", views.archive_chat, name="archive_chat"),
+    path("unarchive/<uuid:chat_id>/", views.unarchive_chat, name="unarchive_chat"),
+    path("archived/", views.archived_history, name="archived_history"),
 ]
 
 if settings.DEBUG:
