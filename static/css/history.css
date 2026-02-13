@@ -294,7 +294,7 @@ body {
     display: none;
     justify-content: center;
     align-items: center;
-    z-index: 9999;
+    z-index: 9000;
 }
 
 .clean-popup-box {
@@ -306,6 +306,8 @@ body {
     text-align: center;
     box-shadow: 0 20px 40px rgba(0,0,0,0.25);
     animation: fadeIn 0.25s ease-in-out;
+    position: relative;
+    z-index: 11000;
 }
 
 /* Buttons */
@@ -547,3 +549,68 @@ body {
     background:whitesmoke   ;
 }
 
+
+/* ===============================
+   SHARE LINK POPUP 
+================================ */
+
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: #fff;
+  margin: 15% auto;
+  padding: 20px;
+  width: 400px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+
+.modal-content input {
+  width: 90%;
+  padding: 8px;
+  margin: 10px 0;
+}
+
+.modal-content button {
+  padding: 8px 16px;
+  background: #4BA3DE;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.close-btn {
+  float: right;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.modal-content {
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 22px;
+  cursor: pointer;
+  color: #4BA3DE;
+}
+
+.close-btn:hover {
+  color: #666;
+}

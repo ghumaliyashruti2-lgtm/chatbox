@@ -27,6 +27,20 @@
             </div>
         </div>
 
+        <!-- SHARE MODAL -->
+        <div id="shareModal" class="modal">
+            <div class="modal-content">
+
+                <span class="close-btn" id="closeShare">&times;</span>
+
+                <input type="text" id="shareLink" readonly />
+
+                <button id="copyShare">Copy</button>
+
+            </div>
+        </div>
+
+
         
         <div class="top-left">
             <!-- Back Button -->
@@ -91,14 +105,17 @@
     <div class="history-body">
 
         {% csrf_token %}
-        
+
         {% if history_groups %}
             {% for chat in history_groups %}
 
-            <div class="history-group">
+            {% ifchanged chat.start_time|localtime|date:"d F, Y" %}
                 <div class="date-title">
                     {{ chat.start_time|localtime|date:"d F, Y" }}
                 </div>
+            {% endifchanged %}
+
+            <div class="history-group">
 
                 <div class="history-row history-wrapper" data-chat="{{ chat.chat_id }}">
 
@@ -123,12 +140,12 @@
                     
                     <div class="menu-wrapper">
 
-                        <button id="menuToggle" class="menu-btn">
+                        <button class="menu-btn">
                             <i class="fa-solid fa-ellipsis-vertical"></i>
                         </button>
 
                         <div id="menuDropdown" class="menu-dropdown">
-                            <div class="menu-item" id="shareChat">
+                            <div class="menu-item history-share" data-chat="{{ chat.chat_id }}">
                                 <!-- ✅ ARCHIVE BUTTON OUTSIDE LINK -->
                                 <button
                                     type="button"
@@ -170,5 +187,7 @@
 
     </div>
 </div>
+
+
 
 {% endblock %}

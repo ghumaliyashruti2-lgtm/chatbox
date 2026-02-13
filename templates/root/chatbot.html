@@ -10,38 +10,36 @@
 
     <!-- HEADER -->
     <div class="chat-header">
+
+        <!-- LEFT -->
         <div class="chat-title">
             <a href="{% url 'home' %}" class="mobile-only" style="color:white;">
                 <i class="fa fa-arrow-left"></i>
             </a>
             <span>Elixir Techne Help Desk</span>
-            <!--<div class="header-right">
-
-                <!-- SHARE CHAT 
-                <button id="shareChatBtn" class="header-btn">
-                    <i class="fa-solid fa-link"></i> Share
-                </button>
-
-                 CREATE GROUP 
-                <button id="createGroupBtn" class="header-btn">
-                    <i class="fa-solid fa-users"></i> Create Group
-                </button>
-
-                 JOIN GROUP
-                <button id="joinGroupBtn" class="header-btn">
-                    <i class="fa-solid fa-user-plus"></i> Join
-                </button>
-            </div> -->
         </div>
-        <!-- Model Selector -->
-        <div class="chat-header-center">
+
+        <!-- RIGHT SIDE -->
+        <div class="header-actions">
+
+            <!-- Share button -->
+            <button id="shareBtn" class="share-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 16V4M12 4L7 9M12 4L17 9"
+                        stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                    <path d="M5 16V18C5 19.1046 5.89543 20 7 20H17C18.1046 20 19 19.1046 19 18V16"
+                        stroke="white" stroke-width="2.5"/>
+                </svg>
+            </button>
+
+            <!-- Model selector -->
             <select id="modelSelect" class="model-select">
                 <option value="openai/gpt-4o-mini">GPT-4o Mini (Fast)</option>
                 <option value="openai/gpt-4o">GPT-4o (Smart)</option>
                 <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
             </select>
+
         </div>
-    
 
         <div class="header-profile mobile-only">
             <a href="{% url 'profiles:profile' %}">
@@ -71,6 +69,18 @@
             </div>
         </div>
 
+    </div>
+
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+
+            <span class="close-btn" id="closeShare">&times;</span>
+
+            <input type="text" id="shareLink" readonly />
+
+            <button id="copyShare">Copy</button>
+
+        </div>
     </div>
 
     <div id="illegalPopup" class="illegal-popup hidden">

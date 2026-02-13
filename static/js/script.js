@@ -27,8 +27,10 @@ themeToggle.addEventListener("change", function(){
     }
 
 });
+
+
 // ======================
-// 3 DOT MENU (MULTIPLE SAFE)
+// 3 DOT MENU History (share , delete, archive )(MULTIPLE SAFE)
 // ======================
 
 document.addEventListener("click", function (e) {
@@ -58,6 +60,21 @@ document.querySelectorAll(".menu-btn").forEach(btn => {
         menu.style.display =
             menu.style.display === "block" ? "none" : "block";
     });
+});
+
+document.querySelectorAll(".menu-item").forEach(item => {
+
+    item.addEventListener("click", function () {
+
+        // find this menu
+        const menu = this.closest(".menu-dropdown");
+
+        if(menu){
+            menu.style.display = "none";
+        }
+
+    });
+
 });
 
 
@@ -302,6 +319,49 @@ function showIllegalPopup() {
 function closeIllegalPopup() {
     document.getElementById("illegalPopup").classList.add("hidden");
 }
+
+
+// ======================
+// SHARE POPUP SYSTEM
+// ======================
+const modal = document.getElementById("shareModal");
+const closeShare = document.getElementById("closeShare");
+const copyBtn = document.getElementById("copyShare");
+const shareInput = document.getElementById("shareLink");
+
+// STOP if modal doesn't exist on this page
+if (modal && closeShare && copyBtn && shareInput) {
+
+  document.querySelectorAll(".share-btn, .history-share").forEach(btn => {
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+
+      const chatId = this.dataset.chat || "CHAT12345";
+      const shareUrl = window.location.origin + "/chat/" + chatId;
+
+      shareInput.value = shareUrl;
+      modal.style.display = "block";
+    });
+  });
+
+  closeShare.onclick = () => modal.style.display = "none";
+
+  window.addEventListener("click", (e) => {
+    if (e.target === modal) modal.style.display = "none";
+  });
+
+  copyBtn.onclick = () => {
+    shareInput.select();
+    navigator.clipboard.writeText(shareInput.value);
+
+    copyBtn.innerText = "Copied!";
+    setTimeout(() => copyBtn.innerText = "Copy", 1500);
+  };
+}
+
+
+
+
 
 // ======================
 // SEND MESSAGE
