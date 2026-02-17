@@ -430,6 +430,10 @@ async function sendMessage(e) {
             <div class="chat-message user-message">
                 <div class="message user">
                     <div class="message-content message-text">${message}</div>
+                     <div class="message-actions">
+                        <span class="edit-btn"><i class="fa fa-edit"></i></span>
+                        <span class="copy-btn"><i class="fa fa-copy"></i></span>
+                    </div>
                 </div>
             </div>
         `);
@@ -461,6 +465,12 @@ async function sendMessage(e) {
             botContent.innerHTML = DOMPurify.sanitize(marked.parse(data.reply || ""));
 
             botMsg.appendChild(botContent);
+            // ✅ ADD COPY BUTTON
+            const actions = document.createElement("div");
+            actions.className = "message-actions";
+            actions.innerHTML = `<span class="copy-btn"><i class="fa fa-copy"></i></span>`;
+            botMsg.appendChild(actions);
+
             botWrapper.appendChild(botMsg);
             chatBody.appendChild(botWrapper);
 
@@ -484,6 +494,13 @@ async function sendMessage(e) {
             botContent.className = "message-content markdown-content message-text";
 
             botMsg.appendChild(botContent);
+
+            // ✅ ADD COPY BUTTON
+            const actions = document.createElement("div");
+            actions.className = "message-actions";
+            actions.innerHTML = `<span class="copy-btn"><i class="fa fa-copy"></i></span>`;
+            botMsg.appendChild(actions);
+            
             botWrapper.appendChild(botMsg);
             chatBody.appendChild(botWrapper);
 
@@ -736,8 +753,51 @@ function toggleSubmenu(e) {
 // ======================
 // ARCHIVE HISTORY LOGIC
 // ======================
+// ======================
+// ARCHIVE / UNARCHIVE COMMON REMOVE
+// ======================
+function removeChatFromUI(chatId){
+
+    const row = document.querySelector(`.history-wrapper[data-chat="${chatId}"]`);
+    if(!row) return;
+
+    const group = row.closest(".history-group");
+    const dateTitle = group?.previousElementSibling;
+
+    // animation
+    row.style.opacity = "0";
+    row.style.transform = "translateX(40px)";
+
+    setTimeout(()=>{
+
+        row.remove();
+
+        // check if any chats still exist under this date
+        let next = dateTitle?.nextElementSibling;
+        let hasChats = false;
+
+        while(next && !next.classList.contains("date-title")){
+
+            if(next.querySelector(".history-wrapper")){
+                hasChats = true;
+                break;
+            }
+
+            next = next.nextElementSibling;
+        }
+
+        // remove empty date
+        if(dateTitle && !hasChats){
+            dateTitle.remove();
+        }
+
+    },250);
+}
 
 
+// ======================
+// ARCHIVE CHAT
+// ======================
 function archiveChat(chatId){
 
     fetch(`/archive/${chatId}/`,{
@@ -747,34 +807,15 @@ function archiveChat(chatId){
         }
     })
     .then(res=>res.json())
-    .then(data=>{
-
-        const row = document.querySelector(`[data-chat="${chatId}"]`);
-        if(!row) return;
-
-        const group = row.closest(".history-group");
-
-        row.style.opacity="0";
-        row.style.transform="translateX(40px)";
-
-        setTimeout(()=>{
-
-            row.remove();
-
-            if(group && group.querySelectorAll(".history-row").length === 0){
-                group.remove();
-            }
-
-        },250);
-
+    .then(()=>{
+        removeChatFromUI(chatId);
     });
 }
 
-// ======================
-// UNARCHIVE HISTORY LOGIC
-// ======================
 
-
+// ======================
+// UNARCHIVE CHAT
+// ======================
 function unarchiveChat(chatId){
 
     fetch(`/unarchive/${chatId}/`,{
@@ -784,29 +825,9 @@ function unarchiveChat(chatId){
         }
     })
     .then(res=>res.json())
-    .then(data=>{
-
-        const row = document.querySelector(`[data-chat="${chatId}"]`);
-        if(!row) return;
-
-        const group = row.closest(".history-group");
-
-        row.style.opacity="0";
-        row.style.transform="translateX(40px)";
-
-        setTimeout(()=>{
-
-            row.remove();
-
-            if(group && group.querySelectorAll(".history-row").length === 0){
-                group.remove();
-            }
-
-        },250);
-
+    .then(()=>{
+        removeChatFromUI(chatId);
     });
-    
-
 }
 
 
@@ -862,4 +883,16 @@ function confirmCleanHistory() {
     }
 } 
 
+function removeChatFromUI(chatId){
 
+    const row = document.querySelector(`[data-chat="${chatId}"]`);
+    if(!row) return;
+
+    const group = row.closest(".history-group");
+
+    row.remove();
+
+    if(group && group.querySelectorAll(".history-row").length === 0){
+        group.remove();
+    }
+}

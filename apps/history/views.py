@@ -1,68 +1,51 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from apps.history.models import History
-import json
-from django.http import JsonResponse
 from apps.profiles.models import Profile
-from collections import defaultdict
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
 from .forms import CleanHistoryForm, DeleteHistoryForm
-from django.http import JsonResponse
+import json
 
+
+# ================================
+# HISTORY PAGE
+# ================================
 @login_required(login_url='login')
 def view_history(request):
 
     profile, _ = Profile.objects.get_or_create(user=request.user)
-
     sort_option = request.GET.get("sort", "newest")
 
-    # Always fetch messages in chronological order
+    # Order directly from DB (IMPORTANT FIX)
+    ordering = "-created_at" if sort_option == "newest" else "created_at"
+
     messages = History.objects.filter(
         user=request.user,
         is_archived=False
-    ).order_by("created_at")
+    ).order_by(ordering)
 
-    # ==========================
-    # GROUP BY CHAT ID
-    # ==========================
-    chat_groups = defaultdict(list)
+    chat_seen = set()
+    history_groups = []
 
+    # One entry per chat (stable order)
     for msg in messages:
-        chat_groups[msg.chat_id].append(msg)
+        if msg.chat_id not in chat_seen:
 
-    history_groups = []
+            is_image = (
+                msg.uploaded_file and
+                msg.uploaded_file.name.lower().endswith((".jpg", ".jpeg", ".png", ".webp"))
+            )
 
-    # ==========================
-    # ONE ENTRY PER CHAT (FIXED)
-    # ==========================
-    history_groups = []
+            history_groups.append({
+                "chat_id": msg.chat_id,
+                "start_time": msg.created_at,
+                "preview": msg.user_message[:60] if msg.user_message else "📷 Image",
+                "image_url": msg.uploaded_file.url if is_image else None,
+                "count": messages.filter(chat_id=msg.chat_id).count(),
+                "from_time": msg.created_at.isoformat(),
+            })
 
-    for chat_id, msgs in chat_groups.items():
-        first_msg = msgs[0]
-
-        is_image = (
-            first_msg.uploaded_file and
-            first_msg.uploaded_file.name.lower().endswith((".jpg", ".jpeg", ".png", ".webp"))
-        )
-
-        history_groups.append({
-            "chat_id": chat_id,
-            "start_time": first_msg.created_at,
-            "preview": first_msg.user_message[:60] if first_msg.user_message else "📷 Image",
-            "image_url": first_msg.uploaded_file.url if is_image else None,
-            "count": len(msgs),
-            "from_time": first_msg.created_at.isoformat(),
-        })
-
-
-    # ==========================
-    # SORT GROUPS
-    # ==========================
-    history_groups.sort(
-        key=lambda x: x["start_time"],
-        reverse=(sort_option == "newest")
-    )
+            chat_seen.add(msg.chat_id)
 
     return render(request, "root/history.html", {
         "history_groups": history_groups,
@@ -71,6 +54,73 @@ def view_history(request):
     })
 
 
+# ================================
+# ARCHIVE CHAT
+# ================================
+@login_required(login_url="login")
+def archive_chat(request, chat_id):
+    if request.method == "POST":
+        History.objects.filter(
+            user=request.user,
+            chat_id=chat_id
+        ).update(is_archived=True)
+
+        return JsonResponse({"status": "archived"})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+# ================================
+# UNARCHIVE CHAT (ONLY ONE!)
+# ================================
+@login_required(login_url="login")
+def unarchive_chat(request, chat_id):
+    if request.method == "POST":
+        History.objects.filter(
+            user=request.user,
+            chat_id=chat_id
+        ).update(is_archived=False)
+
+        return JsonResponse({"status": "unarchived"})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+# ================================
+# ARCHIVED PAGE
+# ================================
+@login_required(login_url="login")
+def archived_history(request):
+
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+
+    messages = History.objects.filter(
+        user=request.user,
+        is_archived=True
+    ).order_by("-created_at")
+
+    chat_seen = set()
+    history_groups = []
+
+    for msg in messages:
+        if msg.chat_id not in chat_seen:
+            history_groups.append({
+                "chat_id": msg.chat_id,
+                "start_time": msg.created_at,
+                "preview": msg.user_message[:60] if msg.user_message else "No message",
+                "from_time": msg.created_at.isoformat(),
+            })
+            chat_seen.add(msg.chat_id)
+
+    return render(request, "root/archive.html", {
+        "history_groups": history_groups,
+        "profile": profile
+    })
+
+
+# ================================
+# CLEAN HISTORY
+# ================================
 @login_required(login_url="login")
 def clean_history(request):
     if request.method == "POST":
@@ -84,6 +134,9 @@ def clean_history(request):
     return JsonResponse({"error": "Invalid request"}, status=400)
 
 
+# ================================
+# DELETE CHAT
+# ================================
 @login_required(login_url='login')
 def delete_history(request, chat_id):
     if request.method == "POST":
@@ -92,77 +145,5 @@ def delete_history(request, chat_id):
             form.delete_history()
             return JsonResponse({"ok": True})
         return JsonResponse({"error": form.errors}, status=400)
-    return JsonResponse({"error": "Invalid request"}, status=400)
-
-@login_required(login_url="login")
-def archive_chat(request, chat_id):
-    if request.method == "POST":
-
-        History.objects.filter(
-            user=request.user,
-            chat_id=chat_id
-        ).update(is_archived=True)
-
-        return JsonResponse({"status": "archived"})
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
-
-@login_required(login_url="login")
-def unarchive_chat(request, chat_id):
-    if request.method == "POST":
-
-        History.objects.filter(
-            user=request.user,
-            chat_id=chat_id
-        ).update(is_archived=False)
-
-        return JsonResponse({"status": "unarchived"})
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
-
-
-@login_required(login_url="login")
-def archived_history(request):
-
-    profile, _ = Profile.objects.get_or_create(user=request.user)
-
-    messages = History.objects.filter(
-        user=request.user,
-        is_archived=True
-    ).order_by("created_at")
-
-    chat_groups = defaultdict(list)
-
-    for msg in messages:
-        chat_groups[msg.chat_id].append(msg)
-
-    history_groups = []
-
-    for chat_id, msgs in chat_groups.items():
-        first_msg = msgs[0]
-
-        history_groups.append({
-            "chat_id": chat_id,
-            "start_time": first_msg.created_at,
-            "preview": first_msg.user_message[:60],
-            "from_time": first_msg.created_at.isoformat(),
-        })
-
-    return render(request,"root/archive.html",{
-        "history_groups":history_groups,
-        "profile":profile
-    })
-
-@login_required(login_url="login")
-def unarchive_chat(request, chat_id):
-
-    if request.method == "POST":
-
-        History.objects.filter(
-            chat_id=chat_id,
-            user=request.user
-        ).update(is_archived=False)
-
-        return JsonResponse({"status": "unarchived"})
 
     return JsonResponse({"error": "Invalid request"}, status=400)

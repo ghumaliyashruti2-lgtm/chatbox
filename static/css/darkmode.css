@@ -20,6 +20,110 @@ body {
     color: #ffffff !important;
 }
 
+/* =====================================
+   🌙 MODAL DARK MODE (Share + Group)
+===================================== */
+
+/* Overlay */
+.modal {
+    background: rgba(0, 0, 0, 0.75) !important;
+}
+
+/* Modal box */
+.modal-content {
+    background: #1A1A1A !important;
+    color: #ffffff !important;
+    border: 1px solid #303030 !important;
+    box-shadow: none !important;
+}
+
+/* Modal inputs */
+.modal-content input {
+    background: #282828 !important;
+    border: 1px solid #303030 !important;
+    color: #ffffff !important;
+}
+
+/* Modal buttons */
+.modal-content button {
+    background: #303030 !important;
+    color: #ffffff !important;
+}
+
+.modal-content button:hover {
+    background: #3a3a3a !important;
+}
+
+/* Close button (X) */
+.close-btn {
+    color: #ffffff !important;
+}
+
+.close-btn:hover {
+    color: #cccccc !important;
+}
+
+
+/* =====================================
+   🌙 SHARE BUTTON & GROUP ICON
+===================================== */
+
+.share-btn,
+.group-btn {
+    background: transparent !important;
+    color: #ffffff !important;
+}
+
+.share-btn:hover,
+.group-btn:hover {
+    color: #cccccc !important;
+}
+
+
+/* =====================================
+   🌙 MOBILE HEADER MENU DARK
+===================================== */
+
+.mobile-header-menu {
+    background: #1A1A1A !important;
+    border: 1px solid #303030 !important;
+}
+
+.mobile-header-menu .settings-item {
+    color: #ffffff !important;
+    border-bottom: 1px solid #303030 !important;
+}
+
+.mobile-header-menu select {
+    background: #282828 !important;
+    border: 1px solid #303030 !important;
+    color: #ffffff !important;
+}
+
+
+/* =====================================
+   🌙 STREAM TOGGLE DARK FIX
+===================================== */
+
+.stream-switch .slider {
+    background: #303030 !important;
+}
+
+.stream-switch input:checked + .slider {
+    background: #3a3a3a !important;
+}
+
+
+/* =====================================
+   🌙 MODEL SELECT FIX (Desktop + Mobile)
+===================================== */
+
+.model-select {
+    background: #282828 !important;
+    border: 1px solid #303030 !important;
+    color: #ffffff !important;
+}
+
 /* CHAT FOOTER */
 .chat-footer {
     background: #282828 !important;

@@ -27,20 +27,6 @@
             </div>
         </div>
 
-        <!-- SHARE MODAL -->
-        <div id="shareModal" class="modal">
-            <div class="modal-content">
-
-                <span class="close-btn" id="closeShare">&times;</span>
-
-                <input type="text" id="shareLink" readonly />
-
-                <button id="copyShare">Copy</button>
-
-            </div>
-        </div>
-
-
         
         <div class="top-left">
             <!-- Back Button -->
@@ -102,92 +88,95 @@
     
     </div>
 
-    <div class="history-body">
+    <div class="history-body" >
 
         {% csrf_token %}
 
         {% if history_groups %}
-            {% for chat in history_groups %}
+            {% regroup history_groups by start_time|localtime|date:"d F, Y" as grouped_history %}
 
-            {% ifchanged chat.start_time|localtime|date:"d F, Y" %}
-                <div class="date-title">
-                    {{ chat.start_time|localtime|date:"d F, Y" }}
-                </div>
-            {% endifchanged %}
+            {% for group in grouped_history %}
 
-            <div class="history-group">
+                <div class="history-group">
 
-                <div class="history-row history-wrapper" data-chat="{{ chat.chat_id }}">
-
-                    <!-- CHAT OPEN -->
-                    <a href="{% url 'chatbot' %}?chat_id={{ chat.chat_id }}&from={{ chat.from_time }}"
-                    class="history-link">
-
-                        <div class="content">
-                            <div class="time">
-                                {{ chat.start_time|localtime|time:"g:i A" }}
-                            </div>
-                            <div class="user-msg history-msg">
-                                {% if chat.image_url %}
-                                    <img src="{{ chat.image_url }}" class="history-thumb">
-                                    <span>Image</span>
-                                {% else %}
-                                    {{ chat.preview }}...
-                                {% endif %}
-                            </div>
-                        </div>
-                    </a>
-                    
-                    <div class="menu-wrapper">
-
-                        <button class="menu-btn">
-                            <i class="fa-solid fa-ellipsis-vertical"></i>
-                        </button>
-
-                        <div id="menuDropdown" class="menu-dropdown">
-                            <div class="menu-item history-share" data-chat="{{ chat.chat_id }}">
-                                <!-- ✅ ARCHIVE BUTTON OUTSIDE LINK -->
-                                <button
-                                    type="button"
-                                    title="Share history"
-                                    class="delete-btn">
-                                    <i class="fa fa-share"></i>
-                                </button>
-                                    Share 
-                            </div>
-                            <div class="menu-item" onclick="event.stopPropagation(); archiveChat('{{ chat.chat_id }}')">
-                                <!-- ✅ ARCHIVE BUTTON OUTSIDE LINK -->
-                                <button
-                                    type="button"
-                                    title="archive history"
-                                    class="delete-btn">
-                                    <i class="fa fa-archive"></i>
-                                </button>
-                                    Archived 
-                            </div>
-                            <div class="menu-item" onclick="event.stopPropagation(); openCleanPopup('{{ chat.chat_id }}')">
-                                <!-- DELETE BUTTON -->
-                                <button
-                                    class="delete-btn"
-                                    type="button">
-                                    <i class="fa fa-trash"></i>
-                                </button>  
-                                Delete 
-                            </div>
-                            
-                        </div>
+                    <div class="date-title">
+                        {{ group.grouper }}
                     </div>
+
+                    {% for chat in group.list %}
+
+                        <div class="history-row history-wrapper" data-chat="{{ chat.chat_id }}">
+
+                            <!-- CHAT OPEN -->
+                            <a href="{% url 'chatbot' %}?chat_id={{ chat.chat_id }}&from={{ chat.from_time }}"
+                            class="history-link">
+
+                                <div class="content">
+                                    <div class="time">
+                                        {{ chat.start_time|localtime|time:"g:i A" }}
+                                    </div>
+                                    <div class="user-msg history-msg">
+                                        {% if chat.image_url %}
+                                            <img src="{{ chat.image_url }}" class="history-thumb">
+                                            <span>Image</span>
+                                        {% else %}
+                                            {{ chat.preview }}...
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </a>
+
+                            <div class="menu-wrapper">
+
+                                <button id="menuToggle" class="menu-btn">
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                </button>
+
+                                <div id="menuDropdown" class="menu-dropdown">
+                                    <div class="menu-item" id="shareChat">
+                                        <!-- ✅ ARCHIVE BUTTON OUTSIDE LINK -->
+                                        <button
+                                            type="button"
+                                            title="Share history"
+                                            class="delete-btn">
+                                            <i class="fa fa-share"></i>
+                                        </button>
+                                            Share 
+                                    </div>
+                                    <div class="menu-item" onclick="event.stopPropagation(); archiveChat('{{ chat.chat_id }}')">
+                                        <!-- ✅ ARCHIVE BUTTON OUTSIDE LINK -->
+                                        <button
+                                            type="button"
+                                            title="archive history"
+                                            class="delete-btn">
+                                            <i class="fa fa-archive"></i>
+                                        </button>
+                                            Archived 
+                                    </div>
+                                    <div class="menu-item" onclick="event.stopPropagation(); openCleanPopup('{{ chat.chat_id }}')">
+                                        <!-- DELETE BUTTON -->
+                                        <button
+                                            class="delete-btn"
+                                            type="button">
+                                            <i class="fa fa-trash"></i>
+                                        </button>  
+                                        Delete 
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+
                 </div>
-            </div>
 
             {% endfor %}
+
         {% else %}
-            <div class="no-history">No history found.</div>
+            <div class="no-history">No Archive history found.</div>
         {% endif %}
 
     </div>
 </div>
-
-
 
 {% endblock %}
