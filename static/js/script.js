@@ -425,6 +425,27 @@ async function sendMessage(e) {
             return;
         }
 
+        // ======================
+        // 🧠 EDIT MODE HANDLING
+        // ======================
+        if (editingMessageElement) {
+
+            // 1️⃣ Remove all messages after edited one
+            let next = editingMessageElement.nextElementSibling;
+            while (next) {
+                const temp = next.nextElementSibling;
+                next.remove();
+                next = temp;
+            }
+
+            // 2️⃣ Remove the edited message itself
+            editingMessageElement.remove();
+
+            // 3️⃣ Exit edit mode
+            editingMessageElement = null;
+        }
+        
+
         // ✅ 3. SHOW USER MESSAGE
         chatBody.insertAdjacentHTML("beforeend", `
             <div class="chat-message user-message">
