@@ -360,9 +360,6 @@ if (modal && closeShare && copyBtn && shareInput) {
 }
 
 
-
-
-
 // ======================
 // SEND MESSAGE
 // ======================

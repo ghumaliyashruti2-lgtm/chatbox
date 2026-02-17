@@ -90,14 +90,21 @@ def unarchive_chat(request, chat_id):
 # ARCHIVED PAGE
 # ================================
 @login_required(login_url="login")
+@login_required(login_url="login")
 def archived_history(request):
 
     profile, _ = Profile.objects.get_or_create(user=request.user)
 
+    # ✅ Get sort from URL
+    sort_option = request.GET.get("sort", "newest")
+
+    # ✅ Apply ordering
+    ordering = "-created_at" if sort_option == "newest" else "created_at"
+
     messages = History.objects.filter(
         user=request.user,
         is_archived=True
-    ).order_by("-created_at")
+    ).order_by(ordering)
 
     chat_seen = set()
     history_groups = []
@@ -114,8 +121,10 @@ def archived_history(request):
 
     return render(request, "root/archive.html", {
         "history_groups": history_groups,
-        "profile": profile
+        "profile": profile,
+        "sort_option": sort_option,   # ✅ VERY IMPORTANT
     })
+
 
 
 # ================================
