@@ -35,18 +35,12 @@
             <i class="fa fa-user-plus"></i>
 
             <!-- Model selector -->
-            <select id="modelSelect" class="model-select">
+            <select id="modelSelect" class="model-select desktop-only">
                 <option value="openai/gpt-4o-mini">GPT-4o Mini (Fast)</option>
                 <option value="openai/gpt-4o">GPT-4o (Smart)</option>
                 <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
             </select>
 
-        </div>
-
-        <div class="header-profile mobile-only">
-            <a href="{% url 'profiles:profile' %}">
-                <img src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}{% static 'images/user_img.png' %}{% endif %}">
-            </a>
         </div>
         <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
                 <i class="fa fa-ellipsis-v"></i>
@@ -69,6 +63,9 @@
                     <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
                 </select>
             </div>
+             <a href="{% url 'profiles:profile' %}" class=" settings-item mobile-menu-item header-profile mobile-only" >
+                <span> Setting </span>
+            </a>
         </div>
 
     </div>

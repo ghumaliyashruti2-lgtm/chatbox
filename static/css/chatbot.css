@@ -483,6 +483,15 @@ body {
     display: none;
 }
 
+/* model select option hide on mobile */
+
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none !important;
+    }
+}
+
+
 /* Tablets */
 @media (max-width: 768px) {
 
@@ -701,11 +710,6 @@ body {
         padding: 10px 12px;
     }
 
-    /* Hide model selector */
-    .chat-header-center {
-        display: none !important;
-    }
-
     /* LEFT: back + title */
     .chat-title {
         display: flex;
@@ -730,11 +734,13 @@ body {
     /* PROFILE ICON */
     .header-profile {
         padding-left: 0 !important;
-        margin-left: auto;
+        margin-left: 2px;
         display: flex;
         align-items: center;
+        text-decoration: none;
     }
 
+     
     /* MOBILE MENU BUTTON */
     .mobile-menu-btn {
         display: flex;
@@ -780,6 +786,9 @@ body {
         font-size: 14px;
     }
 
+    .stream-toggle-item{
+        margin-left: 4px;
+    }
     .mobile-menu-item:last-child {
         border-bottom: none;
     }
