@@ -414,13 +414,26 @@ async function sendMessage(e) {
 
         // 🚫 2. ILLEGAL → popup only
         if (res.status === 403) {
-            showIllegalPopup();
-            
+            const data = await res.json().catch(() => ({}));
+
+            if (data.blocked) {
+                showIllegalPopup();
+            }
+
             isProcessing = false;
             input.disabled = false;
             sendBtn.style.opacity = "1";
             return;
         }
+
+
+        if (!res.ok) {
+            const err = await res.text();
+            console.error("Server error:", err);
+            if (typing) typing.style.display = "none";
+            return;
+        }
+
 
         // ======================
         // 🧠 EDIT MODE HANDLING
@@ -523,6 +536,7 @@ async function sendMessage(e) {
             chatBody.appendChild(botWrapper);
 
             let fullMarkdown = "";
+            let renderTimer="";
 
             while (true) {
                 const { value, done } = await reader.read();
@@ -536,7 +550,14 @@ async function sendMessage(e) {
                 }
 
                 fullMarkdown += chunk;
-                botContent.innerHTML = DOMPurify.sanitize(marked.parse(fullMarkdown));
+                function renderMarkdown() {
+                    botContent.innerHTML = DOMPurify.sanitize(marked.parse(fullMarkdown));
+                }
+
+                clearTimeout(renderTimer);
+                renderTimer = setTimeout(() => {
+                    botContent.innerHTML = DOMPurify.sanitize(marked.parse(fullMarkdown));
+                }, 80);
                 autoScroll();
             }
         }

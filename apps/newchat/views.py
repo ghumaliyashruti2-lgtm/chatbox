@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from datetime import timedelta
 import uuid, base64, traceback
+from threading import Thread
 
 from apps.newchat.forms import ChatbotMessageForm
 from apps.history.models import History
@@ -53,7 +54,10 @@ def new_chatbot(request):
         db_history = History.objects.filter(
             user=request.user,
             chat_id=chat_id
-        ).order_by("created_at")
+        ).only("user_message", "ai_message", "uploaded_file", "created_at") \
+        .order_by("-created_at")[:20]
+
+        db_history = reversed(db_history)
 
         for item in db_history:
             if item.user_message or item.uploaded_file:
@@ -107,11 +111,17 @@ def new_chatbot(request):
             # ✅ ALWAYS DEFINE FIRST
             message = request.POST.get("message", "").strip()
             # 🚫 Guardrails check
-            if message and not check_guardrails(message):
+            if message and len(message) > 3 and not check_guardrails(message):
                 return JsonResponse({"blocked": True}, status=403)
 
 
             uploaded_file = request.FILES.get("file")
+            
+            MAX_IMAGE_SIZE = 2 * 1024 * 1024  # 2MB
+
+            if uploaded_file and uploaded_file.size > MAX_IMAGE_SIZE:
+                return JsonResponse({"error": "Image too large"}, status=400)
+
             image_base64 = request.POST.get("image_base64")
 
             model = request.POST.get("model", "openai/gpt-4o-mini")
@@ -198,8 +208,12 @@ def stream_chatbot(request):
         # =====================
         message = request.POST.get("message", "").strip()
         # 🚫 Guardrails check
-        if message and not check_guardrails(message):
-            return JsonResponse({"blocked": True}, status=403)
+        if message and len(message) > 3 and not check_guardrails(message):
+            return StreamingHttpResponse(
+                '{"blocked": true}',
+                status=403,
+                content_type="application/json"
+            )
 
 
         chat_id = request.POST.get("chat_id")
@@ -218,7 +232,11 @@ def stream_chatbot(request):
         db_history = History.objects.filter(
             user=request.user,
             chat_id=chat_id
-        ).order_by("created_at")
+        ).only("user_message", "ai_message", "uploaded_file", "created_at") \
+        .order_by("-created_at")[:20]
+
+        db_history = reversed(db_history)
+
 
         conversation = []
         for item in db_history:
@@ -281,13 +299,17 @@ def stream_chatbot(request):
                 # =====================
                 # SAVE CHAT HISTORY
                 # =====================
-                History.objects.create(
-                    user=request.user,
-                    chat_id=chat_id,
-                    user_message=message,
-                    ai_message=full_reply,
-                    uploaded_file=uploaded_file
-                )
+                def save_history():
+                    History.objects.create(
+                        user=request.user,
+                        chat_id=chat_id,
+                        user_message=message,
+                        ai_message=full_reply,
+                        uploaded_file=uploaded_file
+                    )
+
+                Thread(target=save_history).start()
+
 
         return StreamingHttpResponse(
             event_stream(),
