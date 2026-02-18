@@ -2,36 +2,36 @@
 // DARK THEME 
 // =================
 const darkSheet = document.getElementById("darkThemeStylesheet");
-const themeToggle = document.getElementById("themeToggle");
+const toggles = document.querySelectorAll(".themeToggle");
 
-// ===== LOAD SAVED THEME =====
+// LOAD SAVED THEME
 const savedTheme = localStorage.getItem("theme");
 
-if(savedTheme === "dark"){
-    darkSheet.removeAttribute("disabled");
-    themeToggle.checked = true;
-}else{
-    darkSheet.setAttribute("disabled","true");
-    themeToggle.checked = false;
+function applyTheme(theme) {
+    if (theme === "dark") {
+        darkSheet.removeAttribute("disabled");
+        toggles.forEach(t => t.checked = true);
+    } else {
+        darkSheet.setAttribute("disabled", "true");
+        toggles.forEach(t => t.checked = false);
+    }
 }
 
-// ===== TOGGLE EVENT =====
-themeToggle.addEventListener("change", function(){
+applyTheme(savedTheme || "light");
 
-    if(this.checked){
-        darkSheet.removeAttribute("disabled");
-        localStorage.setItem("theme","dark");
-    }else{
-        darkSheet.setAttribute("disabled","true");
-        localStorage.setItem("theme","light");
-    }
-
+// ======= TOGGLE EVENT =======
+toggles.forEach(toggle => {
+    toggle.addEventListener("change", function () {
+        const theme = this.checked ? "dark" : "light";
+        localStorage.setItem("theme", theme);
+        applyTheme(theme);
+    });
 });
 
 
-// ======================
+// ============================================================
 // 3 DOT MENU History (share , delete, archive )(MULTIPLE SAFE)
-// ======================
+// ============================================================
 
 document.addEventListener("click", function (e) {
 

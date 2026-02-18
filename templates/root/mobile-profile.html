@@ -8,6 +8,7 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+        <link rel="stylesheet" href="{% static 'css/darkmode.css' %}" disabled id="darkThemeStylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     </head>
     <body>
@@ -31,38 +32,71 @@
 
                 <hr>
 
-                <a href="{% url 'chatbot' %}" style="color:black; text-decoration: none;">
-                    <div class="settings-item">
-                        <i class='fas fa-comment-dots'></i>
-                        <span>New Chat </span>
-                        <i class="fa-solid fa-chevron-right arrow"></i>
-                    </div>
-                </a>   
+                <div class="settings-scroll">
 
-                <a href="{% url 'profiles:my-profile' %}"style= "color:black; text-decoration: none;">
-                    <div class="settings-item">
-                        <i class='fa-regular fa-user'></i>
-                        <span>Profile details </span>
-                        <i class="fa-solid fa-chevron-right arrow"></i>
-                    </div>
-                </a>
+                    <!-- Streaming Toggle -->
+                    <div class="settings-item stream-toggle-item">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>Streaming</span>
 
-                <a href="{% url 'history:history' %}" style="color:black; text-decoration: none;">
-                    <div class="settings-item" >
-                        <i class='fa fa-history'></i>
-                        <span>My History </span>
-                        <i class="fa-solid fa-chevron-right arrow"></i>
+                        <label class="stream-switch">
+                            <input type="checkbox" id="desktopStreamToggle" checked>
+                            <span class="slider"></span>
+                        </label>
                     </div>
-                </a>
+                    <div class="settings-item theme-toggle">
+                        <i class='fas fa-moon'></i>
+                        <span>Dark Mode</span>
+                        <label class="switch">
+                            <input type="checkbox" class="themeToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
 
-                <a href="{% url 'logout' %}"style= "color:black; text-decoration: none;">
-                    <div class="settings-item">
-                        <i class='fas fa-sign-out-alt'></i>
-                        <span>Log out </span>
-                        <i class="fa-solid fa-chevron-right arrow"></i>
-                    </div>
-                </a>
+                
+                    <a href="{% url 'chatbot' %}?action=new" class="settings-link">
+                        <div class="settings-item">
+                            <i class="fas fa-comment-dots"></i>
+                            <span>New Chat</span>
+                            <i class="fa-solid fa-chevron-right arrow"></i>
+                        </div>
+                    </a>
+
+                    <a href="{% url 'profiles:my-profile' %}" class="settings-link">
+                        <div class="settings-item">
+                            <i class='fa-regular fa-user'></i>
+                            <span>Profile details</span>
+                            <i class="fa-solid fa-chevron-right arrow"></i>
+                        </div>
+                    </a>
+
+                    <a href="{% url 'history:history' %}" class="settings-link">
+                        <div class="settings-item">
+                            <i class='fa fa-history'></i>
+                            <span>My History</span>
+                            <i class="fa-solid fa-chevron-right arrow"></i>
+                        </div>
+                    </a>
+
+                    <a href="{% url 'history:archived_history' %}" class="settings-link">
+                        <div class="settings-item">
+                            <i class="fa fa-archive"></i>
+                            <span>Archived</span>
+                            <i class="fa-solid fa-chevron-right arrow"></i>
+                        </div>
+                    </a>
+
+                    <a href="{% url 'logout' %}" class="settings-link">
+                        <div class="settings-item">
+                            <i class='fas fa-sign-out-alt'></i>
+                            <span>Log out</span>
+                            <i class="fa-solid fa-chevron-right arrow"></i>
+                        </div>
+                    </a>
+
+                </div>
         </div>
+        <script src="{% static 'js/script.js' %}"></script> 
         <script>
             (function () {
                 const DESKTOP_URL = "{% url 'profiles:my-profile' %}";
